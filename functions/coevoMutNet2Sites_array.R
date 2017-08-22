@@ -83,7 +83,7 @@ CoevoMutNet2Sites_array <- function(n_sp, f, g, h, alpha, theta_A, theta_B, init
         if ((dif_A < epsilon) & (dif_B < epsilon))
             break
   }
-    return(Z)
+    return(Z[1:(t+1), , ])
 }
 
 #-----------------------------------------------------------------------------------------------------#
