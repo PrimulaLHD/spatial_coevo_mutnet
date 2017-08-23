@@ -7,7 +7,12 @@ fontsize: 12pt
 ## Sort of pertubation theory
 
 ```{r packs, results = 'hide'}
+require(doMC)
+registerDoMC(cores = 3)
 require(plotrix)
+require(dplyr)
+require(magrittr)
+require(ggplot2)
 require(numDeriv)
 require(plyr)
 require(RColorBrewer)
@@ -19,9 +24,11 @@ First, let's source the function that executes simulations.
 source('functions/coevoMutNet2Sites_array.R')
 ```
 
+### Simple Scenario
+
 We start this workflow with a simple scenario: five species of each type, totaling 10 species, with a perfectly nested interaction structure:
 
-```{r set_sp, fig.cap = 'Simple adjacency matrix for five species with a perfectly nested structure. White cells represent ones, black cells represent zeroes.'}
+```{r set_sp, fig.cap = 'Simple adjacency matrix for five species with a perfectly nested structure. White cells represent ones, black cells represent zeroes.', fig.asp = 1}
 n_row <- 5
 n_col <- 5
 n_sp <- n_row + n_col
@@ -54,8 +61,8 @@ g = 0 # gene flow
 p_A = 1 # hotness of A
 p_B = 1 # hotness of B
 
-alpha = 0.1 
-# in this scenario, changing alpha should not induce funky behavior
+alpha = 0.1
+## in this scenario, changing alpha should not induce funky behavior
 
 epsilon = 0.000001
 t_max = 100000
@@ -65,6 +72,9 @@ In this scenario, we expect that every species should have the same value, corre
 
 ```{r sim_scen1, cache = TRUE}
 diffA <- diffB <- c()
+
+## check if there is no variance in final values
+varA <- varB <- c()
 
 for(i in 1:1000)
     {
@@ -90,13 +100,15 @@ for(i in 1:1000)
         
         final <- Z [dim(Z)[1], , ]
 
+        varA[i] <- var(final [, 'A'])
+        varB[i] <- var(final [, 'B'])
+        
         wm_fin_A <- sum(degree * final [, 'A']) / sum(degree)
         wm_fin_B <- sum(degree * final [, 'B']) / sum(degree)
 
         diffA[i] <- wm_fin_A - wmeanA
         diffB[i] <- wm_fin_B - wmeanB
     }
-
 ```
 
 So, the distribution of differences between weighted means for initial and final values should be centered at zero:
@@ -107,4 +119,80 @@ hist(diffA, main = '', xlab = 'Site A')
 hist(diffB, main = '', xlab = 'Site B')
 ```
 
-Cool.
+And all values of species in either sites should be the same, thus having zero variance:
+
+```{r var_scen1}
+summary(varA)
+summary(varB)
+```
+
+Looks zero to me.
+
+### Perturbations
+
+In this simple setting, it is clear that local populations would converge in their phenotypes, and such convergence would depend both on initial conditions and the underlying interaction network.
+Initial conditions of central species  (hm, so maybe supergeneralists invading some community would strongly shift phenotypes of composing populations?).
+Local communities would thus exhibit perfect trait matching (or maybe not so perfect, but perfect *on average*).
+
+Now, we focus on perturbations onto this initial scenario.
+First we introduce gene flow, and observing its effect on the same statistics obtained in the first scenario: the difference between weighted means for initial and final values in either communities, and variances within each community.
+
+(gotta look at the spectrum)
+
+```{r scenario2, cache = TRUE}
+g <- seq(0.001, 0.1, by = 0.001)
+
+set.seed(1037)
+
+scen2 <-
+    aaply(1:100, 1, function(i)
+    {
+        aaply(1:length(g), 1, function(j)
+        {
+            
+            init_A <- rnorm(n_sp, 10, sqrt(10))
+            init_B <- rnorm(n_sp, 20, sqrt(10))
+            
+            degree <- rowSums(f)
+            
+            wmeanA <- sum(init_A * degree) / sum(degree)
+            wmeanB <- sum(init_B * degree) / sum(degree)
+            
+            Z <- CoevoMutNet2Sites_array(n_sp,
+                                         f = f,
+                                         g = rep(g[j], n_sp),
+                                         h = rep(h2, n_sp),
+                                         alpha = alpha,
+                                         theta_A, theta_B,
+                                         init_A, init_B,
+                                         m_A = rep(p_A, n_sp),
+                                         m_B = rep(p_B, n_sp),
+                                         epsilon = 1e-6, t_max)
+            
+            final <- Z [dim(Z)[1], , ]
+            
+            varA <- var(final [, 'A'])
+            varB <- var(final [, 'B'])
+            
+            wm_fin_A <- sum(degree * final [, 'A']) / sum(degree)
+            wm_fin_B <- sum(degree * final [, 'B']) / sum(degree)
+            
+            diffA <- wm_fin_A - wmeanA
+            diffB <- wm_fin_B - wmeanB
+
+           c(diffA, diffB, varA, varB) 
+    })}, .parallel = TRUE)
+
+```
+
+```{r scen2_handling, fig.cap='Distribution of the sum of differences between weighted means for initial and final values for both sites, for values of gene flow between 0 and 0.1'}
+names(dimnames(scen2)) [2] <- 'geneflow'
+dimnames(scen2) [[2]] <- as.character(g)
+dimnames(scen2) [[3]] <- c('diffA', 'diffB', 'varA', 'varB')
+
+adply(scen2, 2) %>%
+    ggplot(.) +
+    geom_violin(aes(x = geneflow, y = (diffA + diffB))) +
+    theme(axis.text.x = element_text(angle = 90, size = 2))
+```
+

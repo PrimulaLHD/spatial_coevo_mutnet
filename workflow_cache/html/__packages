@@ -1,0 +1,9 @@
+base
+rmarkdown
+plotrix
+numDeriv
+plyr
+RColorBrewer
+foreach
+iterators
+doMC
