@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------------------------------#
 
-CoevoMutNet2Sites = function(n_sp, f, g, h, alpha, theta_A, theta_B, init_A, init_B, m_A, m_B,
+CoevoMutNet2Sites = function(n_sp, f, g, alpha, phi_A, phi_B, theta_A, theta_B, init_A, init_B, m_A, m_B,
                              epsilon, t_max) {
   # Simulates the coevolutionary dynamics on a mutualistic network of species interactions at 2 sites
   # connected by gene flow
@@ -9,12 +9,13 @@ CoevoMutNet2Sites = function(n_sp, f, g, h, alpha, theta_A, theta_B, init_A, ini
   #   n_sp: total number of species in the mutualistic network
   #   f: square adjacency matrix representing the mutualistic network
   #   g: vector of gene flow values (symmetric gene flow between site A and B) for all species
-  #   h: vector of heritability values
   #   alpha: parameter alpha, sensitivity of selection to trait matching
-  #   init_A: vector of initial trait values for site A
-  #   init_B: vector of initial trait values for site B
+  #   phi_A: vector of phi values for site A
+  #   phi_B: vector of phi values for site B
   #   theta_A: vector of environmental optimum values for site A
   #   theta_B: vector of environmental optimum values for site B
+  #   init_A: vector of initial trait values for site A
+  #   init_B: vector of initial trait values for site B
   #   m_A: vector of proportion of selection due to mutualism at site A
   #   m_B: vector of proportion of selection due to mutualism at site B
   #   epsilon: value to determine when equilibrium is reached
@@ -47,10 +48,10 @@ CoevoMutNet2Sites = function(n_sp, f, g, h, alpha, theta_A, theta_B, init_A, ini
     q_m_B = q_n_B * m_B 
     sel_dif_A = q_m_A * z_dif_A # calculating selection differentials
     sel_dif_B = q_m_B * z_dif_B
-    r_mut_A = h * apply(sel_dif_A, 1, sum) # response to selection related to mutualism
-    r_env_A = h * (1 - m_A) * (theta_A - z_A) # response to selection related to the environment
-    r_mut_B = h * apply(sel_dif_B, 1, sum)
-    r_env_B = h * (1 - m_B) * (theta_B - z_B) 
+    r_mut_A = phi_A * apply(sel_dif_A, 1, sum) # response to selection related to mutualism
+    r_env_A = phi_A * (1 - m_A) * (theta_A - z_A) # response to selection related to the environment
+    r_mut_B = phi_B * apply(sel_dif_B, 1, sum)
+    r_env_B = phi_B * (1 - m_B) * (theta_B - z_B) 
     z_mat_A[t+1, ] = (1 - g) * (z_A + r_mut_A + r_env_A) + g * (z_B + r_mut_B + r_env_B) # updating z values
     z_mat_B[t+1, ] = (1 - g) * (z_B + r_mut_B + r_env_B) + g * (z_A + r_mut_A + r_env_A) 
     dif_A = mean(abs(z_A - z_mat_A[t+1, ])) # computing the mean difference between old and new z values
