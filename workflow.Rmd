@@ -142,6 +142,7 @@ First we introduce gene flow, and observing its effect on the same statistics ob
 (gotta look at the spectrum)
 
 ```{r scenario2, cache = TRUE}
+
 g <- seq(0.001, 0.1, by = 0.001)
 
 set.seed(1037)
@@ -344,3 +345,85 @@ ggplot(scen3.df) +
 ```
 
 Means for both sites deviate the same amount, regardless of how much gene flow there is.
+Now, what determines such amount?
+
+Nonetheless, it appears that the effect of gene flow is somewhat simple in either scenario, with a binary effect: if it is on, it mixed the distribution of values in a linear fashion.
+
+### Mixing up
+
+So, considering only the effect of interactions between focal species, the community converges to a single trait values, which depends on the weighted average of initial conditions.
+Conversely, when interactions are removed, each species converge to its own "abiotic" optimum, so that the distribution of final values matches the distribution of these optima.
+Thus, what happens when both effects are combined?
+
+```{r hot2cold, cache = TRUE}
+
+set.seed(987)
+
+theta_A <- rnorm(n_sp, 20, sqrt(10)) 
+theta_B <- rnorm(n_sp, 40, sqrt(10))
+
+h2 <- 0.1 # heritability
+
+g = 0.05 # gene flow
+p_A = seq(0.95, 0.05, by = -0.025) # hotness of A
+p_B = 1 # hotness of B
+
+alpha = 0.1
+
+h2c <-
+    aaply(1:length(p_A), 1, function(i)
+    {
+        aaply(1:100, 1, function(j)
+        {
+            
+            init_A <- rnorm(n_sp, 20, sqrt(10))
+            init_B <- rnorm(n_sp, 40, sqrt(10))
+            
+            degree <- rowSums(f)
+            
+            wmeanA <- sum(init_A * degree) / sum(degree)
+            wmeanB <- sum(init_B * degree) / sum(degree)
+            
+            Z <- CoevoMutNet2Sites_array(n_sp,
+                                         f = f,
+                                         g = rep(g, n_sp),
+                                         h = rep(h2, n_sp),
+                                         alpha = alpha,
+                                         theta_A, theta_B,
+                                         init_A, init_B,
+                                         m_A = rep(p_A[i], n_sp),
+                                         m_B = rep(p_B, n_sp),
+                                         epsilon = 1e-6, t_max)
+            
+            final <- Z [dim(Z)[1], , ]
+            
+            varA <- var(final [, 'A'])
+            varB <- var(final [, 'B'])
+            
+            wm_fin_A <- sum(degree * final [, 'A']) / sum(degree)
+            wm_fin_B <- sum(degree * final [, 'B']) / sum(degree)
+            
+            meanA <- mean(final [, 'A'])
+            meanB <- mean(final [, 'B'])
+            
+           c(meanA, meanB, wmeanA, wmeanB, wm_fin_A, wm_fin_B, varA, varB) 
+    })}, .parallel = TRUE)
+
+
+```
+
+```{r h2c_hand}
+h2c.df <- adply(h2c, 1)
+colnames(h2c.df) <- c('hotness', 'meanA', 'meanB', 'wmeanA', 'wmeanB', 'wm_fin_A',
+                      'wm_fin_B', 'varA', 'varB') 
+
+h2c.df $ hotness <- rep(p_A, each = 100)
+
+h2c.df %>%
+    group_by(hotness) %>%
+    summarise_each(funs(mean)) %>%
+    ggplot(.) +
+    geom_line(aes(x = hotness, y = meanA), color = 'red') +
+    geom_line(aes(x = hotness, y = meanB), color = 'blue')
+
+```
