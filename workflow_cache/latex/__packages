@@ -7,3 +7,14 @@ RColorBrewer
 foreach
 iterators
 doMC
+dplyr
+magrittr
+ggplot2
+knitr
+permute
+lattice
+vegan
+statnet.common
+network
+sna
+bipartite
