@@ -13,7 +13,6 @@ require(plotrix)
 require(dplyr)
 require(magrittr)
 require(ggplot2)
-require(numDeriv)
 require(plyr)
 require(RColorBrewer)
 ```
@@ -22,13 +21,15 @@ First, let's source the function that executes simulations.
 
 ```{r init}
 source('functions/coevoMutNet2Sites_array.R')
+
+Norm <- function(x) sqrt(sum(x*x))
 ```
 
 ### Simple Scenario
 
-We start this workflow with a simple scenario: five species of each type, totaling 10 species, with a perfectly nested interaction structure:
+We start this workflow with a simple scenario: 5 species of each type, totaling 10 species, with a perfectly nested interaction structure:
 
-```{r set_sp, fig.cap = 'Simple adjacency matrix for five species with a perfectly nested structure. White cells represent ones, black cells represent zeroes.', fig.asp = 1}
+```{r set_sp, fig.cap = 'Simple adjacency matrix for twenty species with a perfectly nested structure. White cells represent ones, black cells represent zeroes.', fig.asp = 1}
 n_row <- 5
 n_col <- 5
 n_sp <- n_row + n_col
@@ -357,10 +358,7 @@ Thus, what happens when both effects are combined?
 
 ```{r hot2cold, cache = TRUE}
 
-set.seed(987)
-
-theta_A <- rnorm(n_sp, 20, sqrt(10)) 
-theta_B <- rnorm(n_sp, 40, sqrt(10))
+set.seed(971)
 
 h2 <- 0.1 # heritability
 
@@ -371,19 +369,22 @@ p_B = 1 # hotness of B
 alpha = 0.1
 
 h2c <-
-    aaply(1:length(p_A), 1, function(i)
+    aaply(1:100, 1, function(j)
     {
-        aaply(1:100, 1, function(j)
+
+        theta_A <- rnorm(n_sp, 20, sqrt(10)) 
+        theta_B <- rnorm(n_sp, 40, sqrt(10))
+
+        init_A <- runif(n_sp, 10, 30)
+        init_B <- runif(n_sp, 30, 50)
+            
+        degree <- rowSums(f)
+            
+        wmeanA <- sum(init_A * degree) / sum(degree)
+        wmeanB <- sum(init_B * degree) / sum(degree)
+
+        aaply(p_A, 1, function(p)
         {
-            
-            init_A <- rnorm(n_sp, 20, sqrt(10))
-            init_B <- rnorm(n_sp, 40, sqrt(10))
-            
-            degree <- rowSums(f)
-            
-            wmeanA <- sum(init_A * degree) / sum(degree)
-            wmeanB <- sum(init_B * degree) / sum(degree)
-            
             Z <- CoevoMutNet2Sites_array(n_sp,
                                          f = f,
                                          g = rep(g, n_sp),
@@ -391,7 +392,7 @@ h2c <-
                                          alpha = alpha,
                                          theta_A, theta_B,
                                          init_A, init_B,
-                                         m_A = rep(p_A[i], n_sp),
+                                         m_A = rep(p, n_sp),
                                          m_B = rep(p_B, n_sp),
                                          epsilon = 1e-6, t_max)
             
@@ -406,24 +407,136 @@ h2c <-
             meanA <- mean(final [, 'A'])
             meanB <- mean(final [, 'B'])
             
-           c(meanA, meanB, wmeanA, wmeanB, wm_fin_A, wm_fin_B, varA, varB) 
+            dist.theta.A <- Norm(final [, 'A'] - theta_A)
+            dist.theta.B <- Norm(final [, 'B'] - theta_B)
+            
+            c(p, meanA, meanB, wmeanA, wmeanB, wm_fin_A, wm_fin_B,
+              dist.theta.A, dist.theta.B, varA, varB)
+            
     })}, .parallel = TRUE)
-
 
 ```
 
-```{r h2c_hand}
+```{r h2c_hand, fig.cap = 'Difference in weighted average between initial and final values for sites A (red) and B (blue) plotted against relative importance of mutualistic interactions in site A.',  warnings = FALSE}
+
 h2c.df <- adply(h2c, 1)
-colnames(h2c.df) <- c('hotness', 'meanA', 'meanB', 'wmeanA', 'wmeanB', 'wm_fin_A',
-                      'wm_fin_B', 'varA', 'varB') 
+colnames(h2c.df) <- c('init', 'hotness', 'meanA', 'meanB',
+                      'wmeanA', 'wmeanB', 'wm_fin_A', 'wm_fin_B',
+                      'dist.theta.A', 'dist.theta.B', 'varA', 'varB') 
 
-h2c.df $ hotness <- rep(p_A, each = 100)
-
-h2c.df %>%
+h2c.df [, -1] %>%
+    plyr::mutate(diffA = wm_fin_A - wmeanA, diffB = wm_fin_B - wmeanB) %>%
     group_by(hotness) %>%
     summarise_each(funs(mean)) %>%
     ggplot(.) +
-    geom_line(aes(x = hotness, y = meanA), color = 'red') +
-    geom_line(aes(x = hotness, y = meanB), color = 'blue')
+    geom_line(aes(x = hotness, y = diffA), color = 'red') +
+    geom_line(aes(x = hotness, y = diffB), color = 'blue') +
+    theme_bw()
+
+```
+
+```{r h2c_plots}
+h2c.df [, -1] %>%
+    group_by(hotness) %>%
+    summarise_each(funs(mean)) %>%
+    ggplot(.) +
+    geom_line(aes(x = hotness, y = dist.theta.A), color = 'red') +
+    geom_line(aes(x = hotness, y = dist.theta.B), color = 'blue') +
+    theme_bw()
+```
+
+It appears that the difference between weighted means for initial and final values in either sites is independent of the relative importance of mutualistic and abiotic interactions on site A (in this case, site B is as "hot" as it can be).
+
+Probably, actual final values depend on the distribution parameters of initial conditions.
+
+Now what happens when we increase the hotness in a site connected to a cold spot?
+
+```{r cold2hot, cache = TRUE}
+
+set.seed(97)
+
+h2 <- 0.1 # heritability
+
+g = 0.05 # gene flow
+p_A = seq(0.95, 0.05, by = -0.025) # hotness of A
+p_B = 0 # hotness of B
+
+alpha = 0.1
+
+c2h <-
+    aaply(1:100, 1, function(j)
+    {
+
+        theta_A <- rnorm(n_sp, 20, sqrt(10)) 
+        theta_B <- rnorm(n_sp, 40, sqrt(10))
+
+        init_A <- runif(n_sp, 10, 30)
+        init_B <- runif(n_sp, 30, 50)
+            
+        degree <- rowSums(f)
+            
+        wmeanA <- sum(init_A * degree) / sum(degree)
+        wmeanB <- sum(init_B * degree) / sum(degree)
+
+        aaply(p_A, 1, function(p)
+        {
+            Z <- CoevoMutNet2Sites_array(n_sp,
+                                         f = f,
+                                         g = rep(g, n_sp),
+                                         h = rep(h2, n_sp),
+                                         alpha = alpha,
+                                         theta_A, theta_B,
+                                         init_A, init_B,
+                                         m_A = rep(p, n_sp),
+                                         m_B = rep(p_B, n_sp),
+                                         epsilon = 1e-6, t_max)
+            
+            final <- Z [dim(Z)[1], , ]
+            
+            varA <- var(final [, 'A'])
+            varB <- var(final [, 'B'])
+            
+            wm_fin_A <- sum(degree * final [, 'A']) / sum(degree)
+            wm_fin_B <- sum(degree * final [, 'B']) / sum(degree)
+            
+            meanA <- mean(final [, 'A'])
+            meanB <- mean(final [, 'B'])
+            
+            dist.theta.A <- Norm(final [, 'A'] - theta_A)
+            dist.theta.B <- Norm(final [, 'B'] - theta_B)
+            
+            c(p, meanA, meanB, wmeanA, wmeanB, wm_fin_A, wm_fin_B,
+              dist.theta.A, dist.theta.B, varA, varB)
+            
+    })}, .parallel = TRUE)
+
+```
+
+```{r c2h_hand, fig.cap = 'Difference in weighted average between initial and final values for sites A (red) and B (blue) plotted against relative importance of mutualistic interactions in site A.',  warnings = FALSE}
+
+c2h.df <- adply(c2h, 1)
+colnames(c2h.df) <- c('init', 'hotness', 'meanA', 'meanB',
+                      'wmeanA', 'wmeanB', 'wm_fin_A', 'wm_fin_B',
+                      'dist.theta.A', 'dist.theta.B', 'varA', 'varB') 
+
+c2h.df [, -1] %>%
+    plyr::mutate(diffA = wm_fin_A - wmeanA, diffB = wm_fin_B - wmeanB) %>%
+    group_by(hotness) %>%
+    summarise_each(funs(mean)) %>%
+    ggplot(.) +
+    geom_line(aes(x = hotness, y = diffA), color = 'red') +
+    geom_line(aes(x = hotness, y = diffB), color = 'blue') +
+    theme_bw()
+
+```
+
+```{r c2h_plots}
+c2h.df [, -1] %>%
+    group_by(hotness) %>%
+    summarise_each(funs(mean)) %>%
+    ggplot(.) +
+    geom_line(aes(x = hotness, y = dist.theta.A), color = 'red') +
+    geom_line(aes(x = hotness, y = dist.theta.B), color = 'blue') +
+    theme_bw()
 
 ```
