@@ -1,5 +1,6 @@
+
 require(doMC)
-registerDoMC(cores = 30)
+registerDoMC(cores = 16)
 require(plotrix)
 require(plyr)
 require(dplyr)
@@ -40,19 +41,21 @@ thB <- rnorm(sum(dim(net)), 40, 4)
 ### all combinations of simulation values
 par.table <- as.matrix(expand.grid(flow, hotA, hotB))
 
-dimnames(par.table) <- NULL
-
 ## one hundred simulations per combination of g, mA, mB
+it <- 100
+
 ## massive set of lists within lists
-sim.spectral <- alply(1:100, 1, function(i)
+sim.spectral <-
+    alply(1:it, 1, function(i)
     {
         iA <- runif(sum(dim(net)), 10, 50)
         iB <- runif(sum(dim(net)), 10, 50)
-
+        
         alply(1:nrow(par.table), 1, function(j)
-            twoSitesVectorMatch(net, par.table[j, 1], h, temp,
-                                thA, thB, par.table[j, 2], par.table[j, 3], iA, iB), 
-            .parallel = TRUE)
-    })
+            {
+                twoSitesVectorMatch(net, par.table[j, 1], h, temp,
+                                    thA, thB, par.table[j, 2], par.table[j, 3], iA, iB)
+            })
+    }, .parallel = TRUE)
 
 save(sim.spectral, par.list, file = 'Olesen2002_test.RData')
