@@ -1,10 +1,10 @@
 #!/bin/bash
 #PBS -N trait_vector
 #PBS -o trait_vector.out
-#PBS -l nodes=1:ppn=32
+#PBS -l nodes=1:ppn=16
 #PBS -l mem=64gb
-#PBS -l walltime=120:00:00
-#PBS -q long
+#PBS -l walltime=24:00:00
+#PBS -q short
 #PBS -o /home/guilherme/spatial_coevo_mutnet/trait_vector.out
 
 cd /home/guilherme/spatial_coevo_mutnet

@@ -1,5 +1,5 @@
 require(doMC)
-registerDoMC(cores = 32)
+registerDoMC(cores = 16)
 require(plotrix)
 require(plyr)
 require(dplyr)
@@ -43,6 +43,8 @@ par.table <- as.matrix(expand.grid(flow, hotA, hotB))
 ## one hundred simulations per combination of g, mA, mB
 it <- 100
 
+set.seed(906)
+
 ## massive set of lists within lists
 sim.spectral <-
     alply(1:it, 1, function(i)
@@ -67,5 +69,3 @@ sim.spectral <-
     })
 
 save(sim.spectral, par.table, file = 'Olesen2002_test.RData')
-
-str(sim.spectral)

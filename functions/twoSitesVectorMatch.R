@@ -32,9 +32,10 @@
 ##' 
 ##' @return list with three values:
 ##'     Q.eval: matrix with eigenvalues of Q for all iterations
-##'     Q.evec: array of ten first eigenvectors of Q for all iterations
+##'     Q.evec: array of eigenvectors of Q in equilibrium
 ##'     match.corr: vector correlation between traits and
 ##'     optimal trait matching (all traits in both sites are equal)
+##'     final.traits: trait values at end of iterations
 ##' 
 twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
                                 m.A, m.B, init.A, init.B, epsilon = 1e-6, t.max = 100000)
@@ -55,16 +56,15 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
         
         ## outputs
         Q.eval <- array(0, c(t.max, n.sp * 2))
-        Q.evec <- array(0, c(t.max, n.sp * 2, 10))
         trait.match.corr <- c()
-        
+       
         ## vector of ones (theoretical matching)
         theo.match <- rep(1, times = n.sp * 2)
         theo.match <- Normalize(theo.match)
         
         ## zero matrix
         zeros <- diag(0, n.sp)
-        
+       
         ## initial trait values 
         Z [1, , 'A'] <- init.A
         Z [1, , 'B'] <- init.B
@@ -91,11 +91,10 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             ## assemble Q matrix
             Q.mat <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
             
-                ## eigendecomposition
+            ## Q eigendecomposition
             Q.evd <- eigen(Q.mat)
             Q.eval [t, ] <- Q.evd $ values
-            Q.evec [t, , ] <- Q.evd $ vectors [, 1:10]
-            
+
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 
             q.m.B <- q.n.B * m.B
@@ -133,7 +132,8 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             if ((dif.A < epsilon) & (dif.B < epsilon))
                 break
         }
-        return(list('Q.eval' = Q.eval[1:(t+1), ],
-                    'Q.evec' = Q.evec[1:(t+1), , ],
-                    'match.corr' = trait.match.corr))
+        return(list('Q.eval' = Q.eval[1:t, ],
+                    'Q.evec' = Q.evd $ vectors,
+                    'match.corr' = trait.match.corr,
+                    'final.traits' = Z[t+1, , ]))        
     }
