@@ -32,7 +32,7 @@
 ##' 
 ##' @return list with three values:
 ##'     Q.eval: matrix with eigenvalues of Q for all iterations
-##'     Q.evec: array of three first eigenvectors of Q for all iterations
+##'     Q.evec: array of ten first eigenvectors of Q for all iterations
 ##'     match.corr: vector correlation between traits and
 ##'     optimal trait matching (all traits in both sites are equal)
 ##' 
@@ -55,7 +55,7 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
         
         ## outputs
         Q.eval <- array(0, c(t.max, n.sp * 2))
-        Q.evec <- array(0, c(t.max, n.sp * 2, 3))
+        Q.evec <- array(0, c(t.max, n.sp * 2, 10))
         trait.match.corr <- c()
         
         ## vector of ones (theoretical matching)
@@ -94,7 +94,7 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
                 ## eigendecomposition
             Q.evd <- eigen(Q.mat)
             Q.eval [t, ] <- Q.evd $ values
-            Q.evec [t, , ] <- Q.evd $ vectors [, 1:3]
+            Q.evec [t, , ] <- Q.evd $ vectors [, 1:10]
             
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 

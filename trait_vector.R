@@ -26,8 +26,8 @@ source('functions/assembleQ.R')
 net <- binary.networks [[61]] # Olesen 2002 (10 x 12)
 
 ## scenarios to be tested
-flow <- seq(0.01, 0.1, by = 0.01)
-hotA <- seq(0.1, 1, by = 0.1)
+flow <- seq(0.01, 0.1, by = 0.03)
+hotA <- seq(0.2, 1, by = 0.2)
 hotB <- hotA
 
 ## other pars
@@ -50,12 +50,22 @@ sim.spectral <-
         iA <- runif(sum(dim(net)), 10, 100)
         iB <- runif(sum(dim(net)), 10, 100)
 
-        alply(1:nrow(par.table), 1, function(j)
-            {
-                twoSitesVectorMatch(net, par.table[j, 1], h, temp,
-                                    thA, thB, par.table[j, 2], par.table[j, 3], iA, iB)
-            })
-    }, .parallel = TRUE)
+        out <- alply(1:nrow(par.table), 1, function(j)
+        {
+            tryCatch(expr = twoSitesVectorMatch(net, par.table[j, 1],
+                                                h, temp,
+                                                thA, thB,
+                                                par.table[j, 2],
+                                                par.table[j, 3], iA, iB),
+                     error = function(cond) return(NA))
+            
+        }, .parallel = TRUE)
+
+        print(i)
+
+        out
+    })
 
 save(sim.spectral, par.table, file = 'Olesen2002_test.RData')
 
+str(sim.spectral)
