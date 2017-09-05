@@ -62,4 +62,4 @@ sim.spectral <-
         
     })
 
-save(sim.spectral, par.list, file = 'Olesen2002_test.RData')
+save(sim.spectral, par.table, file = 'Olesen2002_test.RData')

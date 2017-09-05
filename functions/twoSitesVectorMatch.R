@@ -93,8 +93,8 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             
                 ## eigendecomposition
             Q.evd <- eigen(Q.mat)
-            Q.eval [i, ] <- Q.evd $ values
-            Q.evec [i, , ] <- Q.evd $ vectors [, 1:3]
+            Q.eval [t, ] <- Q.evd $ values
+            Q.evec [t, , ] <- Q.evd $ vectors [, 1:3]
             
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 
@@ -123,7 +123,7 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             
             traits <- c(Z[t+1, , 'A'], Z[t+1, , 'B'])
             traits <- Normalize(traits)
-            trait.match.corr <- traits %*% theo.match
+            trait.match.corr [t] <- traits %*% theo.match
             
             ## computing the mean difference between old and new z values
             dif.A <- mean(abs(Z[t+1, , 'A'] - Z[t, , 'A'])) 

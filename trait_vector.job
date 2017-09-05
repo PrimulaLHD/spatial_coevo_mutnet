@@ -1,13 +1,11 @@
 #!/bin/bash
 #PBS -N trait_vector
 #PBS -o trait_vector.out
-#PBS -l nodes=1:ppn=16
+#PBS -l nodes=1:ppn=32
 #PBS -l mem=64gb
-#PBS -l walltime=72:00:00
-#PBS -q short
+#PBS -l walltime=120:00:00
+#PBS -q long
 #PBS -o /home/guilherme/spatial_coevo_mutnet/trait_vector.out
 
-export PATH=/home/guilherme/spatial_coevo_mutnet:$PATH
-export CPUS=16
-
-Rscript --vanilla trait_vector.R trait_vector.Rout
+cd /home/guilherme/spatial_coevo_mutnet
+R CMD BATCH trait_vector.R tv.Rout

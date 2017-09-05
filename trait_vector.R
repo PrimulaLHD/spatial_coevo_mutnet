@@ -1,6 +1,5 @@
-
 require(doMC)
-registerDoMC(cores = 16)
+registerDoMC(cores = 32)
 require(plotrix)
 require(plyr)
 require(dplyr)
@@ -35,8 +34,8 @@ hotB <- hotA
 temp <- 0.1
 h <- 0.1
 
-thA <- rnorm(sum(dim(net)), 20, 4)
-thB <- rnorm(sum(dim(net)), 40, 4)
+thA <- rnorm(sum(dim(net)), 30, sqrt(40))
+thB <- rnorm(sum(dim(net)), 70, sqrt(40))
 
 ### all combinations of simulation values
 par.table <- as.matrix(expand.grid(flow, hotA, hotB))
@@ -48,9 +47,9 @@ it <- 100
 sim.spectral <-
     alply(1:it, 1, function(i)
     {
-        iA <- runif(sum(dim(net)), 10, 50)
-        iB <- runif(sum(dim(net)), 10, 50)
-        
+        iA <- runif(sum(dim(net)), 10, 100)
+        iB <- runif(sum(dim(net)), 10, 100)
+
         alply(1:nrow(par.table), 1, function(j)
             {
                 twoSitesVectorMatch(net, par.table[j, 1], h, temp,
@@ -58,4 +57,5 @@ sim.spectral <-
             })
     }, .parallel = TRUE)
 
-save(sim.spectral, par.list, file = 'Olesen2002_test.RData')
+save(sim.spectral, par.table, file = 'Olesen2002_test.RData')
+
