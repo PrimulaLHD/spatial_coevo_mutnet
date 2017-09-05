@@ -1,0 +1,65 @@
+
+require(doMC)
+registerDoMC(cores = 2)
+require(plotrix)
+require(plyr)
+require(dplyr)
+require(magrittr)
+require(ggplot2)
+require(RColorBrewer)
+
+
+### load networks
+binary.files <- dir('data/empirical_networks/binary/')
+binary.networks <- list()
+
+for(i in 1:length(binary.files))
+    binary.networks [[i]] <-
+        as.matrix(read.table(paste0('data/empirical_networks/binary/', binary.files [i])))
+
+names(binary.networks) <- gsub('_bin.txt', '', binary.files)
+
+### load functions
+source('functions/twoSitesVectorMatch.R')
+source('functions/assembleQ.R')
+
+## choose network
+net <- binary.networks [[61]] # Olesen 2002 (10 x 12)
+
+## scenarios to be tested
+flow <- seq(0.01, 0.1, by = 0.03)
+hotA <- seq(0.1, 0.9, by = 0.4)
+hotB <- hotA
+
+## other pars
+temp <- 0.1
+h <- 0.1
+
+thA <- rnorm(sum(dim(net)), 20, 4)
+thB <- rnorm(sum(dim(net)), 40, 4)
+
+### all combinations of simulation values
+par.table <- as.matrix(expand.grid(flow, hotA, hotB))
+
+## one hundred simulations per combination of g, mA, mB
+it <- 10
+
+## massive set of lists within lists
+sim.spectral <-
+    alply(1:it, 1, function(i)
+    {
+        iA <- runif(sum(dim(net)), 10, 50)
+        iB <- runif(sum(dim(net)), 10, 50)
+        
+        alply(1:nrow(par.table), 1, function(j)
+            {
+                twoSitesVectorMatch(net, par.table[j, 1], h, temp,
+                                    thA, thB, par.table[j, 2], par.table[j, 3], iA, iB)
+                
+            }, .parallel = TRUE)
+
+        print(i)
+        
+    })
+
+save(sim.spectral, par.list, file = 'Olesen2002_test.RData')
