@@ -1,4 +1,4 @@
-##' twoSitesVectorMatch
+##' twoSiteSpectral
 ##'
 ##' Simulates the coevolutionary dynamics on a mutualistic network
 ##' of species interactions at two sites connected by gene flow.
@@ -31,14 +31,9 @@
 ##'     and that gene flow has the same rate for all species.
 ##' 
 ##' @return list with three values:
-##'     Q.eval: matrix with eigenvalues of Q for all iterations
-##'     Q.evec: array of eigenvectors of Q in equilibrium
-##'     match.corr: vector correlation between traits and
-##'     optimal trait matching (all traits in both sites are equal)
-##'     final.traits: trait values at end of iterations
 ##' 
-twoSitesVectorMatch <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
-                                m.A, m.B, init.A, init.B, epsilon = 1e-6, t.max = 100000)
+twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
+                            m.A, m.B, init.A, init.B, epsilon = 1e-6, t.max = 100000)
     {
 
         Norm <- function(x) sqrt(sum (x * x))
@@ -103,9 +98,10 @@ twoSitesVectorMatch <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
             Q <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
 
             ## assemble T
-            T <- solve(Ginv - I + Phi %*% (I - M %*% Q))
+            T <- solve(Ginv - I + Phi %*% (I - M %*% Q)) %*% Phi %*% (I - M)
 
-            var.match <- T %*% theo.match
+            
+            
             
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 
