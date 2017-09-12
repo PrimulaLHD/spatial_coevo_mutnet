@@ -20,22 +20,10 @@ for(i in 1:length(binary.files))
 
 names(binary.networks) <- gsub('_bin.txt', '', binary.files)
 
-### load weighted networks
-weighted.files <- dir('data/empirical_networks/weighted/')
-weighted.networks <- list()
-
-for(i in 1:length(weighted.files))
-    weighted.networks [[i]] <-
-        as.matrix(read.table(paste0('data/empirical_networks/weighted/', weighted.files [i])))
-
-names(weighted.networks) <- gsub('_wgt.txt', '', weighted.files)
-
-
 ### load functions
 source('functions/twoSiteSpectral.R')
 source('functions/assembleQ.R')
 source('functions/convMutNet_2.R')
-source('functions/empiricalSpectralT.R')
 
 ## choose network
 net <- binary.networks [[61]] # Olesen 2002 (10 x 12)
@@ -49,8 +37,8 @@ hotB <- hotA
 temp <- 0.1
 h <- 0.1
 
-thA <- rnorm(sum(dim(net)), 30, sqrt(40))
-thB <- rnorm(sum(dim(net)), 70, sqrt(40))
+thA <- runif(sum(dim(net)), 10, 20)
+thB <- runif(sum(dim(net)), 20, 30)
 
 ### all combinations of simulation values
 par.table <- as.matrix(expand.grid(flow, hotA, hotB))
@@ -66,9 +54,12 @@ set.seed(98)
 sim.spectral <-
     alply(1:it, 1, function(i)
     {
-        iA <- runif(sum(dim(net)), 10, 100)
-        iB <- runif(sum(dim(net)), 10, 100)
+        iA <- runif(sum(dim(net)), 10, 30)
+        iB <- runif(sum(dim(net)), 10, 30)
 
+        thA <- runif(sum(dim(net)), 10, 20)
+        thB <- runif(sum(dim(net)), 20, 30)
+        
         out <- alply(1:nrow(par.table), 1, function(j)
         {
             tryCatch(expr = twoSiteSpectral(net, par.table[j, 1],
@@ -85,9 +76,5 @@ sim.spectral <-
         out
     })
 
-test <- twoSiteSpectral(net, par.table[j, 1],
-                        1, temp, thA, thB, par.table[j, 2],
-                        par.table[j, 3], iA, iB)
-
-test $ match.metrics
+save(sim.spectral, par.table, file = 'Olesen2002.RData')
 

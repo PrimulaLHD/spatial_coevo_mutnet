@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -N spectral_sim
+#PBS -o spectral_sim.out
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=64gb
+#PBS -l walltime=24:00:00
+#PBS -q short
+#PBS -o /home/guilherme/spatial_coevo_mutnet/spectral_sim.out
+
+cd /home/guilherme/spatial_coevo_mutnet
+R CMD BATCH spectral_sim.R spectral_sim.Rout
