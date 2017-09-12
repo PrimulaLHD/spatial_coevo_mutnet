@@ -6,10 +6,7 @@
 ##' This function has some alternate output from a more standard simulation output;
 ##' see return statement for details.
 ##' 
-##' @param network.data: list with two elements:
-##'     graph: bipartite network
-##'     n.sp: dims of graph (flower/pollinator species, for example)
-##'
+##' @param graph: bipartite network
 ##' @param g gene flow (symmetric between sites A and B) for all species
 ##' @param phi 'heritability' value
 ##' @param alpha parameter alpha, sensitivity of selection to trait matching
@@ -38,8 +35,10 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
 
         Norm <- function(x) sqrt(sum (x * x))
         Normalize <- function(x) x / Norm (x)
+
+        n.ap <- dim(graph)
         
-        n.sp <- sum(dim(graph))
+        n.sp <- sum(n.ap)
         
         ## square adj matrix
         f <- assembleQ(graph)
@@ -81,27 +80,26 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
             ## current z values
             z.A <- Z[t, , 'A'] 
             z.B <- Z[t, , 'B']
+
+            average.match [t, 'A'] <-
+                mean(convMutNet(n.sp, n.ap [1], n.ap [2], z.A, 'exponential', alpha))
+
+            average.match [t, 'B'] <-
+                mean(convMutNet(n.sp, n.ap [1], n.ap [2], z.B, 'exponential', alpha))
             
             ## matrix with all trait differences
             z.dif.A <- t(f*z.A) - f*z.A 
             z.dif.B <- t(f*z.B) - f*z.B
             
             ## calculating matrix q
-            q.A <- f*(exp(-alpha * (z.dif.A^2))) 
+            q.A <- f*(exp(-alpha * (z.dif.A^2)))
             q.B <- f*(exp(-alpha * (z.dif.B^2)))
             
             ## normalizing the matrix
             q.n.A <- q.A / apply(q.A, 1, sum) 
             q.n.B <- q.B / apply(q.B, 1, sum)
             
-            ## assemble Q matrix
-            Q <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
-
-            ## assemble T
-            T <- solve(Ginv - I + Phi %*% (I - M %*% Q)) %*% Phi %*% (I - M)
-
-            
-            
+            T.eval2 [t] <- T.eig $ values [2]
             
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 
@@ -126,15 +124,13 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
             z.next.B <-
                 (1 - g) * (z.B + r.mut.B + r.env.B) +
                       g * (z.A + r.mut.A + r.env.A) 
+
+            
             
             ## updating z values
             Z[t+1, , 'A'] <- z.next.A
             Z[t+1, , 'B'] <- z.next.B
                     
-            traits <- c(Z[t+1, , 'A'], Z[t+1, , 'B'])
-            traits <- Normalize(traits)
-            trait.match.corr [t] <- traits %*% theo.match
-            
             ## computing the mean difference between old and new z values
             dif.A <- mean(abs(Z[t+1, , 'A'] - Z[t, , 'A'])) 
             dif.B <- mean(abs(Z[t+1, , 'B'] - Z[t, , 'B']))
@@ -144,9 +140,17 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
                 break
         }
 
+        ## assemble Q matrix
+        Q <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
+
+        ## assemble T
+        T <- solve(Ginv - I + Phi %*% (I - M %*% Q)) %*% Phi %*% (I - M)
+
+        ## second eigenvalue
+        T.eig <- eigen(T)
+
         return(list('T.eq' = T,
-                    'T.dist' = Tdist,
-                    'match.corr' = trait.match.corr,
+                    'match.metrics' = match.out,
                     'initial.traits' = Z[1, , ], 
                     'final.traits' = Z[t+1, , ]))        
     }
