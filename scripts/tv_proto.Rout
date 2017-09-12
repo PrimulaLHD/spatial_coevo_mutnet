@@ -1,0 +1,123 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> require(doMC)
+Loading required package: doMC
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: parallel
+> registerDoMC(cores = 2)
+> require(plotrix)
+Loading required package: plotrix
+> require(plyr)
+Loading required package: plyr
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:plyr’:
+
+    arrange, count, desc, failwith, id, mutate, rename, summarise,
+    summarize
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> require(ggplot2)
+Loading required package: ggplot2
+> require(RColorBrewer)
+Loading required package: RColorBrewer
+> 
+> 
+> ### load networks
+> binary.files <- dir('data/empirical_networks/binary/')
+> binary.networks <- list()
+> 
+> for(i in 1:length(binary.files))
++     binary.networks [[i]] <-
++         as.matrix(read.table(paste0('data/empirical_networks/binary/', binary.files [i])))
+> 
+> names(binary.networks) <- gsub('_bin.txt', '', binary.files)
+> 
+> ### load functions
+> source('functions/twoSitesVectorMatch.R')
+> source('functions/assembleQ.R')
+> 
+> ## choose network
+> net <- binary.networks [[61]] # Olesen 2002 (10 x 12)
+> 
+> ## scenarios to be tested
+> flow <- seq(0.01, 0.1, by = 0.03)
+> hotA <- seq(0.1, 0.9, by = 0.4)
+> hotB <- hotA
+> 
+> ## other pars
+> temp <- 0.1
+> h <- 0.1
+> 
+> thA <- rnorm(sum(dim(net)), 20, 4)
+> thB <- rnorm(sum(dim(net)), 40, 4)
+> 
+> ### all combinations of simulation values
+> par.table <- as.matrix(expand.grid(flow, hotA, hotB))
+> 
+> ## one hundred simulations per combination of g, mA, mB
+> it <- 10
+> 
+> ## massive set of lists within lists
+> sim.spectral <-
++     alply(1:it, 1, function(i)
++     {
++         iA <- runif(sum(dim(net)), 10, 50)
++         iB <- runif(sum(dim(net)), 10, 50)
++         
++         alply(1:nrow(par.table), 1, function(j)
++             {
++                 twoSitesVectorMatch(net, par.table[j, 1], h, temp,
++                                     thA, thB, par.table[j, 2], par.table[j, 3], iA, iB)
++                 
++             }, .parallel = TRUE)
++ 
++         print(i)
++         
++     })
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+> 
+> save(sim.spectral, par.list, file = 'Olesen2002_test.RData')
+Error in save(sim.spectral, par.list, file = "Olesen2002_test.RData") : 
+  object ‘par.list’ not found
+Execution halted

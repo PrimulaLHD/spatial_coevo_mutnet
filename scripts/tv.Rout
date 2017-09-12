@@ -1,0 +1,222 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> require(doMC)
+Loading required package: doMC
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: parallel
+> registerDoMC(cores = 16)
+> require(plotrix)
+Loading required package: plotrix
+> require(plyr)
+Loading required package: plyr
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:plyr’:
+
+    arrange, count, desc, failwith, id, mutate, rename, summarise,
+    summarize
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> require(ggplot2)
+Loading required package: ggplot2
+> require(RColorBrewer)
+Loading required package: RColorBrewer
+> 
+> 
+> ### load networks
+> binary.files <- dir('data/empirical_networks/binary/')
+> binary.networks <- list()
+> 
+> for(i in 1:length(binary.files))
++     binary.networks [[i]] <-
++         as.matrix(read.table(paste0('data/empirical_networks/binary/', binary.files [i])))
+> 
+> names(binary.networks) <- gsub('_bin.txt', '', binary.files)
+> 
+> ### load functions
+> source('functions/twoSitesVectorMatch.R')
+> source('functions/assembleQ.R')
+> 
+> ## choose network
+> net <- binary.networks [[61]] # Olesen 2002 (10 x 12)
+> 
+> ## scenarios to be tested
+> flow <- seq(0.01, 0.1, by = 0.03)
+> hotA <- seq(0.2, 1, by = 0.2)
+> hotB <- hotA
+> 
+> ## other pars
+> temp <- 0.1
+> h <- 0.1
+> 
+> thA <- rnorm(sum(dim(net)), 30, sqrt(40))
+> thB <- rnorm(sum(dim(net)), 70, sqrt(40))
+> 
+> ### all combinations of simulation values
+> par.table <- as.matrix(expand.grid(flow, hotA, hotB))
+> 
+> ## one hundred simulations per combination of g, mA, mB
+> it <- 100
+> 
+> set.seed(906)
+> 
+> ## massive set of lists within lists
+> sim.spectral <-
++     alply(1:it, 1, function(i)
++     {
++         iA <- runif(sum(dim(net)), 10, 100)
++         iB <- runif(sum(dim(net)), 10, 100)
++ 
++         out <- alply(1:nrow(par.table), 1, function(j)
++         {
++             tryCatch(expr = twoSitesVectorMatch(net, par.table[j, 1],
++                                                 h, temp,
++                                                 thA, thB,
++                                                 par.table[j, 2],
++                                                 par.table[j, 3], iA, iB),
++                      error = function(cond) return(NA))
++             
++         }, .parallel = TRUE)
++ 
++         print(i)
++ 
++         out
++     })
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+[1] 31
+[1] 32
+[1] 33
+[1] 34
+[1] 35
+[1] 36
+[1] 37
+[1] 38
+[1] 39
+[1] 40
+[1] 41
+[1] 42
+[1] 43
+[1] 44
+[1] 45
+[1] 46
+[1] 47
+[1] 48
+[1] 49
+[1] 50
+[1] 51
+[1] 52
+[1] 53
+[1] 54
+[1] 55
+[1] 56
+[1] 57
+[1] 58
+[1] 59
+[1] 60
+[1] 61
+[1] 62
+[1] 63
+[1] 64
+[1] 65
+[1] 66
+[1] 67
+[1] 68
+[1] 69
+[1] 70
+[1] 71
+[1] 72
+[1] 73
+[1] 74
+[1] 75
+[1] 76
+[1] 77
+[1] 78
+[1] 79
+[1] 80
+[1] 81
+[1] 82
+[1] 83
+[1] 84
+[1] 85
+[1] 86
+[1] 87
+[1] 88
+[1] 89
+[1] 90
+[1] 91
+[1] 92
+[1] 93
+[1] 94
+[1] 95
+[1] 96
+[1] 97
+[1] 98
+[1] 99
+[1] 100
+> 
+> save(sim.spectral, par.table, file = 'Olesen2002_test.RData')
+> 
+> proc.time()
+     user    system   elapsed 
+48083.376  3375.368 16683.534 
