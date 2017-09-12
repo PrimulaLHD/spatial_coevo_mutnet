@@ -49,10 +49,6 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
         
         Z <- array(0, c(t.max, n.sp, 2))
         dimnames(Z) [[3]] <- c('A', 'B')
-
-        ## vector of ones (theoretical matching)
-        theo.match <- rep(1, times = n.sp * 2)
-        theo.match <- Normalize(theo.match)
         
         ## zero matrix
         zeros <- diag(0, n.sp)
@@ -81,12 +77,6 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
             z.A <- Z[t, , 'A'] 
             z.B <- Z[t, , 'B']
 
-            average.match [t, 'A'] <-
-                mean(convMutNet(n.sp, n.ap [1], n.ap [2], z.A, 'exponential', alpha))
-
-            average.match [t, 'B'] <-
-                mean(convMutNet(n.sp, n.ap [1], n.ap [2], z.B, 'exponential', alpha))
-            
             ## matrix with all trait differences
             z.dif.A <- t(f*z.A) - f*z.A 
             z.dif.B <- t(f*z.B) - f*z.B
@@ -125,8 +115,6 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
                 (1 - g) * (z.B + r.mut.B + r.env.B) +
                       g * (z.A + r.mut.A + r.env.A) 
 
-            
-            
             ## updating z values
             Z[t+1, , 'A'] <- z.next.A
             Z[t+1, , 'B'] <- z.next.B
@@ -142,15 +130,16 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
 
         ## assemble Q matrix
         Q <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
-
+        
         ## assemble T
         T <- solve(Ginv - I + Phi %*% (I - M %*% Q)) %*% Phi %*% (I - M)
 
-        ## second eigenvalue
-        T.eig <- eigen(T)
-
+        average.match <-
+            c(mean(convMutNet(n.sp, n.ap [1], n.ap [2], z.A, 'exponential', alpha)),
+              mean(convMutNet(n.sp, n.ap [1], n.ap [2], z.B, 'exponential', alpha)))
+              
         return(list('T.eq' = T,
-                    'match.metrics' = match.out,
+                    'av.match' =  average.match, 
                     'initial.traits' = Z[1, , ], 
                     'final.traits' = Z[t+1, , ]))        
     }
