@@ -37,10 +37,12 @@
 ##'     optimal trait matching (all traits in both sites are equal)
 ##'     final.traits: trait values at end of iterations
 ##' 
-twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
+twoSitesVectorMatch <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
                                 m.A, m.B, init.A, init.B, epsilon = 1e-6, t.max = 100000)
     {
-        Normalize <- function(x) x / sqrt(sum (x * x))
+
+        Norm <- function(x) sqrt(sum (x * x))
+        Normalize <- function(x) x / Norm (x)
         
         n.sp <- sum(dim(graph))
         
@@ -53,18 +55,27 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
         
         Z <- array(0, c(t.max, n.sp, 2))
         dimnames(Z) [[3]] <- c('A', 'B')
-        
-        ## outputs
-        Q.eval <- array(0, c(t.max, n.sp * 2))
-        trait.match.corr <- c()
-       
+
         ## vector of ones (theoretical matching)
         theo.match <- rep(1, times = n.sp * 2)
         theo.match <- Normalize(theo.match)
         
         ## zero matrix
         zeros <- diag(0, n.sp)
-       
+
+        I <- diag(1, n.sp * 2)
+        
+        ## matrices
+        M <- rbind(cbind(diag(rep(m.A, n.sp)), zeros),
+                   cbind(zeros, diag(rep(m.B, n.sp))))
+        
+        G <- rbind(cbind(diag(1 - g, n.sp), diag(g, n.sp)),
+                   cbind(diag(g, n.sp), diag(1 - g, n.sp)))
+
+        Phi <- diag(rep(phi, 2))
+        
+        Ginv <- solve(G)
+        
         ## initial trait values 
         Z [1, , 'A'] <- init.A
         Z [1, , 'B'] <- init.B
@@ -89,12 +100,13 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             q.n.B <- q.B / apply(q.B, 1, sum)
             
             ## assemble Q matrix
-            Q.mat <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
-            
-            ## Q eigendecomposition
-            Q.evd <- eigen(Q.mat)
-            Q.eval [t, ] <- Q.evd $ values
+            Q <- cbind(rbind(q.n.A, zeros), rbind(zeros, q.n.B))
 
+            ## assemble T
+            T <- solve(Ginv - I + Phi %*% (I - M %*% Q))
+
+            var.match <- T %*% theo.match
+            
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 
             q.m.B <- q.n.B * m.B
@@ -110,16 +122,19 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             ## response to selection related to the environment
             r.env.A <- phi * (1 - m.A) * (theta.A - z.A) 
             r.env.B <- phi * (1 - m.B) * (theta.B - z.B)
+
+            z.next.A <-
+                (1 - g) * (z.A + r.mut.A + r.env.A) +
+                      g * (z.B + r.mut.B + r.env.B) 
+
+            z.next.B <-
+                (1 - g) * (z.B + r.mut.B + r.env.B) +
+                      g * (z.A + r.mut.A + r.env.A) 
             
             ## updating z values
-            Z[t+1, , 'A'] <-
-                    (1 - g) * (z.A + r.mut.A + r.env.A) +
-                          g * (z.B + r.mut.B + r.env.B) 
-            
-            Z[t+1, , 'B'] <-
-                    (1 - g) * (z.B + r.mut.B + r.env.B) +
-                          g * (z.A + r.mut.A + r.env.A) 
-            
+            Z[t+1, , 'A'] <- z.next.A
+            Z[t+1, , 'B'] <- z.next.B
+                    
             traits <- c(Z[t+1, , 'A'], Z[t+1, , 'B'])
             traits <- Normalize(traits)
             trait.match.corr [t] <- traits %*% theo.match
@@ -132,8 +147,10 @@ twoSitesVectorMatch <- function(graph, g, phi, alpha, theta.A, theta.B,
             if ((dif.A < epsilon) & (dif.B < epsilon))
                 break
         }
-        return(list('Q.eval' = Q.eval[1:t, ],
-                    'Q.evec' = Q.evd $ vectors,
+
+        return(list('T.eq' = T,
+                    'T.dist' = Tdist,
                     'match.corr' = trait.match.corr,
+                    'initial.traits' = Z[1, , ], 
                     'final.traits' = Z[t+1, , ]))        
     }
