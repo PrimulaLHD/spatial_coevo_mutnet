@@ -3,18 +3,19 @@
 # Description: 
 #   Reads coevolution simulation data from all 72 empirical networks with a specific combination of
 #   m_A and m_B and many g values and calculates mean and standard deviation of (1) initial and final
-#   trait matching, (2) initial and final environmental matching, and (3) initial and final geographic 
-#   divergence.
+#   trait matching, (2) initial and final trait convergence, (3) initial and final environmental matching,
+#   and (4) initial and final geographic divergence.
 #
 # Returns:
 #   Save the results as csv spreadsheets. 
 
 # loading functions and packages
 source("functions/MatchingMutNet.R")
+source("functions/ConvMutNet.R")
 
 # defining mutualistic selection values used in simulations
-m_A = 0.9
-m_B = 0.9
+m_A = 0.7
+m_B = 0.7
 # for the file name
 m_A_char = gsub(".", "", as.character(m_A), fixed = TRUE)
 m_B_char = gsub(".", "", as.character(m_B), fixed = TRUE)
@@ -46,6 +47,10 @@ summary_df = data.frame(network = rep(net_names, each = n_sim),
                         sd_init_mut_matching = rep(NA, length(net_names)*n_sim),
                         mean_final_mut_matching = rep(NA, length(net_names)*n_sim),
                         sd_final_mut_matching = rep(NA, length(net_names)*n_sim),
+                        init_trait_var = rep(NA, length(net_names)*n_sim),
+                        final_trait_var = rep(NA, length(net_names)*n_sim),
+                        init_conv = rep(NA, length(net_names)*n_sim),
+                        final_conv = rep(NA, length(net_names)*n_sim),
                         mean_init_env_matching = rep(NA, length(net_names)*n_sim),
                         sd_init_env_matching = rep(NA, length(net_names)*n_sim),
                         mean_final_env_matching = rep(NA, length(net_names)*n_sim),
@@ -64,6 +69,10 @@ for (i in 1:length(net_names)) {
   sd_init_mut_matching = c()
   mean_final_mut_matching = c()
   sd_final_mut_matching = c()
+  init_trait_var = c()
+  final_trait_var = c()
+  init_conv = c()
+  final_conv = c()
   mean_init_env_matching = c()
   sd_init_env_matching = c()
   mean_final_env_matching = c()
@@ -73,7 +82,7 @@ for (i in 1:length(net_names)) {
   mean_final_divergence = c()
   sd_final_divergence = c()
   # reading network
-  mat = as.matrix(read.table(paste("data/empirical_networks/", net_names[i], ".txt", sep = ""), 
+  mat = as.matrix(read.table(paste("data/empirical_networks/binary/", net_names[i], ".txt", sep = ""), 
                              sep = " ", header = FALSE))
   # defining number of rows, columns and species
   n_row = nrow(mat)
@@ -112,6 +121,19 @@ for (i in 1:length(net_names)) {
                                    z = final_traits, method = "exponential", alpha = alpha)
     mean_final_mut_matching[j] = final_mut_mat[[1]]
     sd_final_mut_matching[j] = sd(final_mut_mat[[2]]$matching)
+    # initial and final trait convergence
+    init_trait_var_both = ConvMutNet(n_sp = n_sp, n_row = n_row, n_col = n_col, 
+                                     z = init_traits, method = "nuismer", alpha = alpha)
+    init_trait_var[j] = mean(init_trait_var_both) 
+    final_trait_var_both = ConvMutNet(n_sp = n_sp, n_row = n_row, n_col = n_col, 
+                                      z = final_traits, method = "nuismer", alpha = alpha)
+    final_trait_var[j] = mean(final_trait_var_both)
+    init_conv_both = ConvMutNet(n_sp = n_sp, n_row = n_row, n_col = n_col, 
+                                z = init_traits, method = "exponential", alpha = alpha)
+    init_conv[j] = mean(init_conv_both)
+    final_conv_both = ConvMutNet(n_sp = n_sp, n_row = n_row, n_col = n_col, 
+                                 z = final_traits, method = "exponential", alpha = alpha)
+    final_conv[j] = mean(final_conv_both)
     # initial and final environmental matching
     init_env_matching = exp(-alpha * (init_traits - thetas)^2)
     mean_init_env_matching[j] = mean(init_env_matching)
@@ -148,6 +170,10 @@ for (i in 1:length(net_names)) {
   summary_df[summary_df$network == net_names[i], "sd_init_mut_matching"] = sd_init_mut_matching
   summary_df[summary_df$network == net_names[i], "mean_final_mut_matching"] = mean_final_mut_matching
   summary_df[summary_df$network == net_names[i], "sd_final_mut_matching"] = sd_final_mut_matching
+  summary_df[summary_df$network == net_names[i], "init_trait_var"] = init_trait_var
+  summary_df[summary_df$network == net_names[i], "final_trait_var"] = final_trait_var
+  summary_df[summary_df$network == net_names[i], "init_conv"] = init_conv
+  summary_df[summary_df$network == net_names[i], "final_conv"] = final_conv
   summary_df[summary_df$network == net_names[i], "mean_init_env_matching"] = mean_init_env_matching
   summary_df[summary_df$network == net_names[i], "sd_init_env_matching"] = sd_init_env_matching
   summary_df[summary_df$network == net_names[i], "mean_final_env_matching"] = mean_final_env_matching
