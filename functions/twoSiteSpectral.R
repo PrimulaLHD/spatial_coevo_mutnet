@@ -89,8 +89,6 @@ twoSiteSpectral <- function(graph, g, phi = 1, alpha, theta.A, theta.B,
             q.n.A <- q.A / apply(q.A, 1, sum) 
             q.n.B <- q.B / apply(q.B, 1, sum)
             
-            T.eval2 [t] <- T.eig $ values [2]
-            
             ## multiplying each row i of matrix q by m[i]
             q.m.A <- q.n.A * m.A 
             q.m.B <- q.n.B * m.B

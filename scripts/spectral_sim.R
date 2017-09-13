@@ -1,11 +1,13 @@
 require(doMC)
-registerDoMC(cores = 3)
+registerDoMC(cores = 32)
 require(plotrix)
 require(plyr)
 require(dplyr)
 require(magrittr)
 require(ggplot2)
 require(RColorBrewer)
+
+setwd('~/spatial_coevo_mutnet/')
 
 Norm <- function(x) sqrt(sum (x * x))
 Normalize <- function(x) x / Norm (x)
@@ -22,33 +24,31 @@ names(binary.networks) <- gsub('_bin.txt', '', binary.files)
 
 ### load functions
 source('functions/twoSiteSpectral.R')
+
 source('functions/assembleQ.R')
 source('functions/convMutNet_2.R')
 
 ## choose network
-net <- binary.networks [[61]] # Olesen 2002 (10 x 12)
+net <- binary.networks [[45]] # Olesen 2002 (10 x 12)
 
 ## scenarios to be tested
-flow <- seq(0.01, 0.1, by = 0.03)
+flow <- seq(0, 0.4, by = 0.05)
 hotA <- seq(0.2, 1, by = 0.2)
 hotB <- hotA
 
 ## other pars
-temp <- 0.1
-h <- 0.1
-
-thA <- runif(sum(dim(net)), 10, 20)
-thB <- runif(sum(dim(net)), 20, 30)
+temp <- 0.2
+h <- 1
 
 ### all combinations of simulation values
 par.table <- as.matrix(expand.grid(flow, hotA, hotB))
 
+par.table <- par.table [par.table [, 2] >= par.table [, 3], ]
+
 ## one hundred simulations per combination of g, mA, mB
 it <- 100
 
-j <- 62
-
-set.seed(98)
+set.seed(987)
 
 ## massive set of lists within lists
 sim.spectral <-
@@ -73,8 +73,8 @@ sim.spectral <-
 
         print(i)
 
-        out
+        return(list(out, thA, thB))
     })
 
-save(sim.spectral, par.table, file = 'Olesen2002.RData')
+save(sim.spectral, par.table, file = 'Arroyo1982.RData')
 
