@@ -59,20 +59,18 @@ colnames(metrics.df) <- c('init', 'rep', 'eval2', 'evar', 'avmA', 'avmB')
 
 metrics.df <- cbind(par.table [metrics.df $ rep, ], metrics.df)
 
-head(metrics.df)
+metrics.df $ g <- factor(metrics.df $ g)
+metrics.df $ mA <- factor(metrics.df $ mA)
+metrics.df $ mB <- factor(metrics.df $ mB)
 
 metrics.df %>%
     mutate('Mod2' = Mod(eval2),
            'mean.match' = rowMeans(cbind(avmA, avmB)),
            'scenario' = paste0('mA = ', mA, ', mB = ', mB)) %>%
-    filter(g == 0.2 & mA >= mB) %>%
     ggplot(.) +
-    geom_point(aes(x = avmB, y = evar, color = mA)) +
-    facet_wrap(~ mB) +
-    scale_color_viridis(option = 'C') +
+    geom_point(aes(x = avmB, y = evar, color = mA, shape = mB)) +
+    facet_wrap(~ g) +
+    scale_color_viridis(option = 'C', direction = -1, discrete = TRUE) +
     theme_bw()
 
 dev.off(dev.cur())
-
-    
-eval.df <- adply(Ayo.eval, 1:3)
