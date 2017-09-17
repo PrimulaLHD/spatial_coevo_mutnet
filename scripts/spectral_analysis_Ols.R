@@ -22,9 +22,15 @@ dimnames(Olesen.Tmat) [[3]] <- NULL
 
 Ols.eval <- aaply(Olesen.Tmat, c(1, 2), function(T) eigen(T) $ values)
 
-Ols.evar
+Ols.evar <- aaply(Ols.eval, c(1, 2), function(ev) var(Mod(ev)))
+
+Ols.det <- aaply(Olesen.Tmat, c(1, 2), function(T) det(T))
 
 names(dimnames(Ols.eval)) <- c('init', 'rep', 'eval')
+
+names(dimnames(Ols.evar)) <- c('init', 'rep')
+
+names(dimnames(Ols.det)) <- c('init', 'rep')
 
 ## have some non zero im part
 
@@ -33,29 +39,34 @@ Ols.match <-
         laply(L1 [[1]] [1:96], function(L2) L2 $ av.match))
 
 match.df <- adply(Ols.match, 1:2)
-
 eval2.df <- adply(Ols.eval [, , 2], 1:2)
+evar.df <-  adply(Ols.evar, 1:2)
+det.df <- adply(Ols.det, 1:2)
 
-eval.df <-  adply(Ols.eval, 1:3)
+metrics.df <- cbind(eval2.df, evar.df [, 3], det.df [, 3], match.df [, 2:3])
 
-metrics.df <- cbind(eval2.df, match.df [, 2:3])
-
-colnames(metrics.df) <- c('init', 'rep', 'eval2', 'avmA', 'avmB')
+colnames(metrics.df) <- c('init', 'rep', 'eval2', 'evar', 'det', 'avmA', 'avmB')
 
 metrics.df <- cbind(par.table [metrics.df $ rep, ], metrics.df)
 
 head(metrics.df)
 
-metrics.df %>%
+metrics.df $ g <- factor(metrics.df $ g)
+metrics.df $ mA <- factor(metrics.df $ mA)
+metrics.df $ mB <- factor(metrics.df $ mB) 
+
+var.avm.Ols <- 
+    metrics.df %>%
     mutate('Mod2' = Mod(eval2),
            'mean.match' = rowMeans(cbind(avmA, avmB)),
            'scenario' = paste0('mA = ', mA, ', mB = ', mB)) %>%
-    filter(g > 0.09 & mA >= mB) %>%
     ggplot(.) +
-    geom_point(aes(x = mean.match, y = Mod2)) +
-    facet_wrap(~ scenario) +
-    #scale_color_viridis() +
+    geom_point(aes(x = avmA, y = evar, color = mA, shape = mB)) +
+    facet_wrap(~ g) +
+    scale_color_viridis(option = 'C', direction = -1, discrete = TRUE) +
     theme_bw()
+
+ggsave('var_avm_Ols.pdf', var.avm.Ols, width = 10, height = 10)
 
 eval.df <- cbind(as.character(par.table [eval.df $ rep, ]), eval.df)
 
