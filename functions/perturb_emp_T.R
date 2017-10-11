@@ -49,7 +49,7 @@ perturbEmpT <- function(graph, mA, mB, pert_g_seq,
                         
                         pert_sp = sp_order[1:sp_index]
                         
-                        g_mult[c(pert_sp, pert_sp + n_sp)] <- 0
+                        g_mult[pert_sp] <- 0
                         
                     }
                     

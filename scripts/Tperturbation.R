@@ -34,26 +34,24 @@ m.table <- m.table[m.table [, 1] >= m.table [, 2], ]
 
 ## run
 
-line <- m.table [1, ]
+perturb.results <-
+    ldply(weighted.networks,
+          function(L)
+          {
+              adply(m.table, 1, function(line)
+              {
+                  results.mat <- perturbEmpT(L, line [1], line [2], line [3],
+                                         n_rep_pert = 30, n_theta = 30)
+                  
+                  par.tab <- matrix(rep(line, times = nrow(results.mat)),
+                                    byrow = TRUE, ncol = 3)
 
-L <- weighted.networks[[1]]
+                  colnames(par.tab) <- c('mA', 'mB', 'pert_g_seq')
+                  
+                  out <- cbind(par.tab, results.mat)
 
-
-Out <- ldply(weighted.networks,
-             function(L)
-             {
-                 aaply(m.table, 1, function(line)
-                 {
-                     out.mat <- perturbEmpT(L, line [1], line [2], line [3],
-                                           n_rep_pert = 2, n_theta = 2)
-
-                     par.tab <- matrix(rep(line, times = nrow(outmat)), byrow = TRUE)
-
-                     colnames(par.tab) <- c('mA', 'mB', 'pert_g_seq')
-                     
-                     cbind(out.mat, par.tab)
-                     
-                 }, .parallel = TRUE)
-                 
-      })
+                  out
+                  
+              }, .parallel = TRUE)
+          })
 
