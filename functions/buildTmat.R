@@ -81,8 +81,17 @@ buildTmat <- function(graph, g, phi = 0.5, alpha = 0.2,
         tm.B <- mean(convMutNet(sum(n.sps), n.sps [1], n.sps [2],
                                 z.B, 'exponential', alpha))
 
+        sd.lines <- mean(apply(T, 2, sd))
+
+        T.norm <- apply(T, 1, Normalize)
+
+        T.corr <- T.norm %*% t(T.norm)
+
+        T.mcorr <- mean(T.corr[lower.tri(T.corr)])
+        
         c('traitmatch.A' = tm.A, 'traitmatch.B' = tm.B,
           'eval2' = eval2, 'evar' = evar, 'perc' = perc,
-          'Lap.eval1' = Lap.evals [1], 'Lap.eval2' = Lap.evals [2], 
+          'Lap.eval1' = Lap.evals [1], 'Lap.eval2' = Lap.evals [2],
+          'sd.lines' = sd.lines, 'mcorr.lines' = T.mcorr,
           'evalS' = evalS, 'complex' = complex)
     }
