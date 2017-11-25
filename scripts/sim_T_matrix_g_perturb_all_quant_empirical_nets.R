@@ -132,9 +132,14 @@ for(i in 1:length(net_files)) {
         eigen2_T = eigen_T[2]
         # determinant
         det_T = prod(eigen_T)
+        
+        # function to obtain vector norm
+        norm = function(x) sqrt(sum(x^2))
+        # normalize T matrix
+        T_norm = T_matrix/as.vector(apply(T_matrix, 1, norm))
         # mean correlation among rows
-        corr_mat = T_matrix%*%t(T_matrix)
-        mean_row_corr_T = mean(corr_mat)
+        corr_mat = T_norm %*% t(T_norm)
+        mean_row_corr_T = mean(corr_mat[lower.tri(corr_mat)])
         
         for (t in 1:n_theta) {
           
