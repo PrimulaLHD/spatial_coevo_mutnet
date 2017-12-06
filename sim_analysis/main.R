@@ -28,7 +28,6 @@ filenames <- filenames [grepl('all_networks', filenames)]
 alpha <- 0.2
 phi <- 0.5 # with 0.1 sd
 
-
 Tsims.out <-
     adply(1:length(filenames), 1, function(i) ## run over zip files
     {
@@ -135,6 +134,4 @@ Tsims.out <-
         print('removed files')
         
         nets.output
-    })
-
-save(Tsims.out, file = 'Tsims.RData')
+    }); save(Tsims.out, file = 'Tsims.RData')

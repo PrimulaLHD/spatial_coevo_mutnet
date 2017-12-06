@@ -15,15 +15,13 @@ colnames(par.table) <- c('g', 'mA', 'mB')
 
 Arroyo.spec <- sim.spectral
 
-Arroyo.Tmat <- 
-    llply(Arroyo.spec,
-          function(L1) llply(L1 [[1]],
-                             function(L2) if(length(L2) > 1) return(L2 $ T.eq)))
-
-Arroyo.Tmat <- llply(Arroyo.Tmat, function(L1) L1 [!laply(L1, is.null)])
-Arroyo.Tmat <- llply(Arroyo.Tmat, function(L1) laply(L1, identity))
-
-Arroyo.Tmat <- laply(Arroyo.Tmat, identity)
+Arroyo.sec <- 
+    adply(1:100, 1, function(i)
+        adply(1:100, 1, function(j)
+            if(length(Arroyo.spec [[i]] [[1]] [[j]]) > 1)
+                return(eigen(Arroyo.spec [[i]] [[1]] [[j]] $ T.eq) $ values[2])
+            else
+                return(NA)))
 
 Ayo.match <- 
     llply(Arroyo.spec,
@@ -51,7 +49,7 @@ evar.df <- adply(Ayo.evar, 1:2)
 
 match.df <- adply(Ayo.match, 1:2)
 
-head(match.df)
+head(metrics.df)
 
 metrics.df <- cbind(eval2.df, evar.df [, 3], match.df [, 3:4])
 

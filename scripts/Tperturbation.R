@@ -1,9 +1,10 @@
 require(plyr)
 require(dplyr)
 require(doMC)
-registerDoMC(cores = 3)
+registerDoMC(cores = 16)
 
 source('functions/MatchingMutNet.R')
+source('functions/perturb_emp_T.R')
 
 ### load weighted networks
 weighted.files <- dir('data/empirical_networks/weighted/')
@@ -38,20 +39,24 @@ perturb.results <-
     ldply(weighted.networks,
           function(L)
           {
-              adply(m.table, 1, function(line)
-              {
-                  results.mat <- perturbEmpT(L, line [1], line [2], line [3],
-                                         n_rep_pert = 30, n_theta = 30)
-                  
-                  par.tab <- matrix(rep(line, times = nrow(results.mat)),
-                                    byrow = TRUE, ncol = 3)
+              Out <-
+                  adply(m.table, 1, function(line)
+                  {
+                      results.mat <- perturbEmpT(L, line [1], line [2], line [3],
+                                                 n_rep_pert = 30, n_theta = 30)
+                      
+                      par.tab <- matrix(rep(line, times = nrow(results.mat)),
+                                        byrow = TRUE, ncol = 3)
 
-                  colnames(par.tab) <- c('mA', 'mB', 'pert_g_seq')
+                      colnames(par.tab) <- c('mA', 'mB', 'pert_g_seq')
                   
-                  out <- cbind(par.tab, results.mat)
+                      out <- cbind(par.tab, results.mat)
 
-                  out
+                      return(out)
                   
-              }, .parallel = TRUE)
-          })
+                  }, .parallel = TRUE)
 
+              return(Out)
+          }, .progress = 'text')
+
+save(perturb.results, file = 'perturbationT.results.RData')

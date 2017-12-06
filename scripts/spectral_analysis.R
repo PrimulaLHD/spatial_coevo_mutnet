@@ -7,21 +7,27 @@ require(magrittr)
 require(ggplot2)
 require(RColorBrewer)
 
-load('Olesen2002.RData')
+## load('Arroyo1982.RData')
 
 colnames(par.table) <- c('g', 'mA', 'mB')
 
-Olesen.spec <- sim.spectral
+Arroyo.spec <- sim.spectral
 
-llply(Olesen.spec [[1]], is.na)
+Arroyo.Tmat <- 
+    llply(Arroyo.spec,
+          function(L1) llply(L1 [[1]],
+                             function(L2) if(length(L2) > 1) return(L2 $ T.eq)))
 
-Olesen.Tmat <-
-    laply(Olesen.spec, function(L1)
-        laply(L1 [[1]] [1:96], function(L2) L2 $ T.eq))
+llply(Arroyo.Tmat, function(L1)
 
-dimnames(Olesen.Tmat) [[3]] <- NULL
 
-Ols.eval <- aaply(Olesen.Tmat, c(1, 2), function(T) eigen(T) $ values)
+Arroyo.Tmat <-
+    lply(Arroyo.spec, function(L1)
+        laply(L1 [[1]], function(L2) L2 $ T.eq))
+
+dimnames(Arroyo.Tmat) [[3]] <- NULL
+
+Ols.eval <- aaply(Arroyo.Tmat, c(1, 2), function(T) eigen(T) $ values)
 
 Ols.eval [, , 2] #init, rep, eval
 
