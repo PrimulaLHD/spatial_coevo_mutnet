@@ -13,6 +13,8 @@ require(cowplot)
 ## load data
 load('data/Tsims.RData')
 
+source('functions/buildTmat.R')
+source('functions/assembleQ.R')
 
 ## real columns as real
 Tsims.re.trans <-
@@ -202,3 +204,213 @@ ggplot(subset(T.sims.sumdf, mA == '0.9' & mB == '0.1')) +
 
 dev.off(dev.cur())
 
+### make some matrices
+
+example.networks <- dir('example_sims', pattern = '.txt')
+
+example.graph <-
+    alply(1:2, 1,
+          function(i)
+              as.matrix(read.csv(paste0('example_sims/', example.networks [i]),
+                                 header = FALSE, sep = ' ')))
+
+names(example.graph) <- c('Carlo', 'Galetti')
+
+example.sim <- dir('example_sims', pattern = '.csv')
+
+example.pars <-
+    aaply(example.sim, 1, function(fil)
+    {
+        params <- strsplit(fil, '[(?=[:alpha:]) (?=[:punct:])]') [[1]]
+        ms <- params[params != ''] [2:4]
+        ifelse(ms == '005', as.numeric(ms) * .01, as.numeric(ms) * .1)
+    })
+
+colnames(example.pars) <- c('mA', 'mB', 'g')
+
+example.pars <- example.pars [c(1:8) * 2, ]
+
+example.Z <-
+    alply(example.sim, 1, function(fil)
+        as.matrix(read.csv(paste0('example_sims/', fil), row.names = 1)))
+
+ex.Z.A <- example.Z [(c(1:8) * 2) - 1]
+ex.Z.B <- example.Z [(c(1:8) * 2)]
+
+alpha <- 0.2
+phi <- 0.5 # with 0.1 sd
+
+## carlo
+
+carloT <-
+    alply(1:4, 1, function(i)
+        buildTmat(example.graph [[1]],
+                  g = example.pars [i, 'g'],
+                  m.A = example.pars [i, 'mA'],
+                  m.B = example.pars [i, 'mB'],
+                  theta.A = ex.Z.A [[i]] ['theta_A', ],
+                  theta.B = ex.Z.B [[i]] ['theta_B', ],
+                  value.A = ex.Z.A [[i]] ['z_A_final', ],
+                  value.B = ex.Z.B [[i]] ['z_B_final', ],
+                  output.matrix = TRUE))
+
+color2D.matplot(carloT [[1]])
+
+carloT <-
+    laply(carloT, function(mat)
+    {
+        rownames(mat) <- colnames(mat) <- NULL
+        mat
+    })
+
+carloT <- aperm(carloT, c(2, 3, 1))
+
+dimnames(carloT) <- list(1:72, 1:72, 1:4)
+
+names(dimnames(carloT)) <- c('row', 'col', 'slice')
+
+carlo.df <- adply(carloT, 1:3)
+
+colnames(carlo.df) <- c('row', 'col', 'slice', 'value')
+
+carlo.df <- cbind(carlo.df, example.pars [as.numeric(carlo.df $ slice), ])
+
+carlo.df $ row <- factor(as.character(carlo.df $ row), levels = as.character(72:1))
+
+carlo.df $ mA <- factor(paste('mA =', carlo.df $ mA),
+                        levels = paste('mA =', unique(carlo.df $ mA)))
+
+carlo.df $ mB <- factor(paste('mB =', carlo.df $ mA),
+                        levels = paste('mB =', unique(carlo.df $ mA)))
+
+
+## all matrices
+ggplot(carlo.df) +
+    geom_tile(aes(y = row, x = col, fill = value)) +
+    facet_wrap(~ slice) +
+    scale_fill_viridis(option = 'B', direction = -1, na.value = 'white') +
+    theme_bw()
+
+## submatrices no geneflow
+
+pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Carlo_no_geneflow_m01_09.pdf',
+    width = 15, height = 7)
+
+ggplot(subset(carlo.df, row %in% as.character(1:36) & col %in% as.character(1:36) & g == 0)) +
+    geom_tile(aes(y = row, x = col, fill = value)) +
+    facet_wrap(~ mA, nrow = 1) +
+    scale_fill_viridis('Interaction\nStrength',
+                       option = 'B', direction = -1, na.value = 'white') +
+    theme_bw() +
+    scale_y_discrete(breaks = NULL) +
+    scale_x_discrete(breaks = NULL) +
+    xlab(NULL) +
+    ylab(NULL)
+    
+dev.off(dev.cur())
+
+## fullmatrices, geneflow effect
+
+pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Carlo_g005_03_mA07_mB07.pdf',
+    width = 15, height = 7)
+
+ggplot(subset(carlo.df, g != 0)) +
+    geom_tile(aes(y = row, x = col, fill = value)) +
+    facet_wrap(~ g, nrow = 1) +
+    scale_fill_viridis('Interaction\nStrength',
+                       option = 'B', direction = -1, na.value = 'white') +
+    theme_bw() +
+    scale_y_discrete(breaks = NULL) +
+    scale_x_discrete(breaks = NULL) +
+    xlab(NULL) +
+    ylab(NULL)
+
+dev.off(dev.cur())
+
+## galetti
+
+galettiT <-
+    alply(5:8, 1, function(i)
+        buildTmat(example.graph [[2]],
+                  g = example.pars [i, 'g'],
+                  m.A = example.pars [i, 'mA'],
+                  m.B = example.pars [i, 'mB'],
+                  theta.A = ex.Z.A [[i]] ['theta_A', ],
+                  theta.B = ex.Z.B [[i]] ['theta_B', ],
+                  value.A = ex.Z.A [[i]] ['z_A_final', ],
+                  value.B = ex.Z.B [[i]] ['z_B_final', ],
+                  output.matrix = TRUE))
+
+color2D.matplot(galettiT [[1]])
+
+galettiT <-
+    laply(galettiT, function(mat)
+    {
+        rownames(mat) <- colnames(mat) <- NULL
+        mat
+    })
+
+galettiT <- aperm(galettiT, c(2, 3, 1))
+
+dimnames(galettiT) <- list(1:128, 1:128, 1:4)
+
+names(dimnames(galettiT)) <- c('row', 'col', 'slice')
+
+galetti.df <- adply(galettiT, 1:3)
+
+colnames(galetti.df) <- c('row', 'col', 'slice', 'value')
+
+galetti.df <- cbind(galetti.df, example.pars [as.numeric(galetti.df $ slice), ])
+
+galetti.df $ row <- factor(as.character(galetti.df $ row), levels = as.character(128:1))
+
+galetti.df $ mA <- factor(paste('mA =', galetti.df $ mA),
+                        levels = paste('mA =', unique(galetti.df $ mA)))
+
+galetti.df $ mB <- factor(paste('mB =', galetti.df $ mA),
+                        levels = paste('mB =', unique(galetti.df $ mA)))
+
+
+## all matrices
+ggplot(galetti.df) +
+    geom_tile(aes(y = row, x = col, fill = value)) +
+    facet_wrap(~ slice) +
+    scale_fill_viridis(option = 'B', direction = -1, na.value = 'white') +
+    theme_bw()
+
+## submatrices no geneflow
+
+pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Galetti_no_geneflow_m01_09.pdf',
+    width = 15, height = 7)
+
+ggplot(subset(galetti.df, row %in% as.character(1:64) &
+                          col %in% as.character(1:64) & g == 0)) +
+    geom_tile(aes(y = row, x = col, fill = value)) +
+    facet_wrap(~ mA, nrow = 1) +
+    scale_fill_viridis('Interaction\nStrength',
+                       option = 'B', direction = -1, na.value = 'white') +
+    theme_bw() +
+    scale_y_discrete(breaks = NULL) +
+    scale_x_discrete(breaks = NULL) +
+    xlab(NULL) +
+    ylab(NULL)
+    
+dev.off(dev.cur())
+
+## fullmatrices, geneflow effect
+
+pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Galetti_g005_03_mA07_mB07.pdf',
+    width = 15, height = 7)
+
+ggplot(subset(galetti.df, g != 0)) +
+    geom_tile(aes(y = row, x = col, fill = value)) +
+    facet_wrap(~ g, nrow = 1) +
+    scale_fill_viridis('Interaction\nStrength',
+                       option = 'B', direction = -1, na.value = 'white') +
+    theme_bw() +
+    scale_y_discrete(breaks = NULL) +
+    scale_x_discrete(breaks = NULL) +
+    xlab(NULL) +
+    ylab(NULL)
+
+dev.off(dev.cur())

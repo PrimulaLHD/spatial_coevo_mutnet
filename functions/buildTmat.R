@@ -1,5 +1,5 @@
 buildTmat <- function(graph, g, phi = 0.5, alpha = 0.2,
-                      m.A, m.B, theta.A, theta.B, value.A, value.B)
+                      m.A, m.B, theta.A, theta.B, value.A, value.B, output.matrix = FALSE)
     {
         Norm <- function(x) sqrt(sum (x * x))
         Normalize <- function(x) x / Norm (x)
@@ -9,6 +9,7 @@ buildTmat <- function(graph, g, phi = 0.5, alpha = 0.2,
         n.sp <- sum(n.sps)
         
         ## square adj matrix
+        
         f <- assembleQ(graph)
         
         ## same gene flow and 'heritability'
@@ -56,42 +57,48 @@ buildTmat <- function(graph, g, phi = 0.5, alpha = 0.2,
         ## assemble T
         T <- solve(Lap) %*% Phi %*% (I - M)
 
-        Lap.eig <- eigen(Lap)
+        if(output.matrix)
+            return(T)
+        else
+            {
+                Lap.eig <- eigen(Lap)
         
-        T.eig <- eigen(T)
+                T.eig <- eigen(T)
         
-        ## metrics
-        eval2 <- T.eig $ values [2]
-        evar <- var(Re(T.eig $ values))
-        perc <- 1 / sum(Re(T.eig $ values))
+                ## metrics
+                eval2 <- T.eig $ values [2]
+                evar <- var(Re(T.eig $ values))
+                perc <- 1 / sum(Re(T.eig $ values))
 
-        Lap.evals <- Lap.eig $ values [1:2]
+                Lap.evals <- Lap.eig $ values [1:2]
         
-        complex <- as.numeric(any(abs(Im(T.eig $ values)) > .Machine$double.eps))
+                complex <-
+                    as.numeric(any(abs(Im(T.eig $ values)) > .Machine$double.eps))
         
-        eval.count <- table(cut(Re(T.eig $ values), seq(0, 1, 0.01)))
-        eval.freq <- eval.count / sum(eval.count)
+                eval.count <- table(cut(Re(T.eig $ values), seq(0, 1, 0.01)))
+                eval.freq <- eval.count / sum(eval.count)
 
-        eval.freq <- eval.freq[eval.freq != 0]
-        evalS <- - sum(eval.freq * log(eval.freq, 2))
+                eval.freq <- eval.freq[eval.freq != 0]
+                evalS <- - sum(eval.freq * log(eval.freq, 2))
 
-        tm.A <- mean(convMutNet(sum(n.sps), n.sps [1], n.sps [2],
-                                z.A, 'exponential', alpha))
+                tm.A <- mean(convMutNet(sum(n.sps), n.sps [1], n.sps [2],
+                                        z.A, 'exponential', alpha))
 
-        tm.B <- mean(convMutNet(sum(n.sps), n.sps [1], n.sps [2],
-                                z.B, 'exponential', alpha))
+                tm.B <- mean(convMutNet(sum(n.sps), n.sps [1], n.sps [2],
+                                        z.B, 'exponential', alpha))
 
-        sd.lines <- mean(apply(T, 2, sd))
+                sd.lines <- mean(apply(T, 2, sd))
 
-        T.norm <- apply(T, 1, Normalize)
+                T.norm <- apply(T, 1, Normalize)
+                
+                T.corr <- T.norm %*% t(T.norm)
 
-        T.corr <- T.norm %*% t(T.norm)
-
-        T.mcorr <- mean(T.corr[lower.tri(T.corr)])
+                T.mcorr <- mean(T.corr[lower.tri(T.corr)])
         
-        c('traitmatch.A' = tm.A, 'traitmatch.B' = tm.B,
-          'eval2' = eval2, 'evar' = evar, 'perc' = perc,
-          'Lap.eval1' = Lap.evals [1], 'Lap.eval2' = Lap.evals [2],
-          'sd.lines' = sd.lines, 'mcorr.lines' = T.mcorr,
-          'evalS' = evalS, 'complex' = complex)
+                c('traitmatch.A' = tm.A, 'traitmatch.B' = tm.B,
+                  'eval2' = eval2, 'evar' = evar, 'perc' = perc,
+                  'Lap.eval1' = Lap.evals [1], 'Lap.eval2' = Lap.evals [2],
+                  'sd.lines' = sd.lines, 'mcorr.lines' = T.mcorr,
+                  'evalS' = evalS, 'complex' = complex)
+            }
     }
