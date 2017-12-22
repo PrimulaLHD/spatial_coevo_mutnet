@@ -15,15 +15,6 @@ source("functions/MatchingMutNet.R")
 # reading data
 summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
 
-# changing mutualism names
-summ_final_mut_mat_df$mutualism = as.character(summ_final_mut_mat_df$mutualism)
-summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "AE"] = "ant-EFN"
-summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "AM"] = "ant-myrmecophyte"
-summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "CC"] = "cleaner-client"
-summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "FA"] = "fish-anemone"
-summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "FP"] = "frugivore-plant"
-summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "PP"] = "pollinator-plant"
-
 #-------------------------------------------------------------------------#
 # Fig. 2A: trait matching vs gene flow for one network with mA = mB = 0.7 #
 #-------------------------------------------------------------------------#
@@ -32,10 +23,10 @@ summ_final_mut_mat_df$mutualism[summ_final_mut_mat_df$mutualism == "PP"] = "poll
 p_A_1 = ggplot(data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.7 & m_B == 0.7 & network == "FP_Galetti&Pizo_1996_bin"),
                aes(x = g, y = mean_final_mut_mat)) +
   geom_errorbar(aes(ymin = lower_lim_final_mut_mat, ymax = upper_lim_final_mut_mat), 
-                width = 0.004, color = "gray50", size = 0.7) +
-  geom_point(size = 4, shape = 19, color = "#1AB245") + 
+                width = 0.004, size = 0.5) +
+  geom_point(size = 4, shape = 21, fill = "#1AB245") + 
   xlab("Mean gene flow") +
-  ylab("Network-level trait matching") +
+  ylab("Mean trait matching") +
   scale_y_continuous(limits = c(0.5, 1)) +
   theme(axis.text.x = element_text(size = 13),
         axis.text.y = element_text(size = 13),
@@ -68,7 +59,7 @@ pair_mat$column = as.numeric(substr(as.character(pair_mat$column), start = 2,
 p_A_2 = ggplot(data = pair_mat, aes(x = column, y = row, fill = matching,
                                     height = 0.9, width = 0.9)) + 
   geom_tile(color = "black", size = 0.2) +
-  scale_fill_viridis(option = "plasma", direction = -1, limits = c(0, 1)) +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1)) +
   ylab("Plant species") +
   xlab("Animal species") +
   theme_bw() +
@@ -97,7 +88,7 @@ pair_mat$column = as.numeric(substr(as.character(pair_mat$column), start = 2,
 p_A_3 = ggplot(data = pair_mat, aes(x = column, y = row, fill = matching,
                                     height = 0.9, width = 0.9)) + 
   geom_tile(color = "black", size = 0.2) +
-  scale_fill_viridis(option = "plasma", direction = -1, limits = c(0, 1)) +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1)) +
   ylab("Plant species") +
   xlab("Animal species") +
   theme_bw() +
@@ -117,10 +108,10 @@ p_A_3 = ggplot(data = pair_mat, aes(x = column, y = row, fill = matching,
 p_B_1 = ggplot(data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.9 & m_B == 0.1 & network == "FP_Galetti&Pizo_1996_bin"),
                aes(x = g, y = mean_final_mut_mat)) +
   geom_errorbar(aes(ymin = lower_lim_final_mut_mat, ymax = upper_lim_final_mut_mat), 
-                width = 0.004, color = "gray50", size = 0.7) +
-  geom_point(size = 4, shape = 19, color = "#1AB245") + 
+                width = 0.004, size = 0.5) +
+  geom_point(size = 4, shape = 21, fill = "#1AB245") + 
   xlab("Mean gene flow") +
-  ylab("Network-level trait matching") +
+  ylab("Mean trait matching") +
   scale_y_continuous(limits = c(0.5, 1)) +
   theme(axis.text.x = element_text(size = 13),
         axis.text.y = element_text(size = 13),
@@ -144,7 +135,7 @@ pair_mat$column = as.numeric(substr(as.character(pair_mat$column), start = 2,
 p_B_2 = ggplot(data = pair_mat, aes(x = column, y = row, fill = matching,
                                     height = 0.9, width = 0.9)) + 
   geom_tile(color = "black", size = 0.2) +
-  scale_fill_viridis(option = "plasma", direction = -1, limits = c(0, 1)) +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1)) +
   ylab("Plant species") +
   xlab("Animal species") +
   theme_bw() +
@@ -173,7 +164,7 @@ pair_mat$column = as.numeric(substr(as.character(pair_mat$column), start = 2,
 p_B_3 = ggplot(data = pair_mat, aes(x = column, y = row, fill = matching,
                                     height = 0.9, width = 0.9)) + 
   geom_tile(color = "black", size = 0.2) +
-  scale_fill_viridis(option = "plasma", direction = -1, limits = c(0, 1)) +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1)) +
   ylab("Plant species") +
   xlab("Animal species") +
   theme_bw() +
@@ -189,8 +180,7 @@ p_B_3 = ggplot(data = pair_mat, aes(x = column, y = row, fill = matching,
 p_legend = ggplot(data = pair_mat, aes(x = row, y = column, fill = matching,
                                        height = 0.9, width = 0.9)) + 
   geom_tile(color = "black", size = 0.2) +
-  scale_fill_viridis(option = "plasma", direction = -1, 
-                     limits = c(0, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1), name = "Trait\nmatching") +
   theme(legend.title = element_text(size = 13),
         legend.text = element_text(size = 12),
         legend.key.size = unit(0.55, "cm"))

@@ -30,7 +30,7 @@ theta = c(1.5, 9, 5)
 net = network(f, directed = FALSE, ignore.eval = FALSE)
 
 set.seed(18)
-p_net = ggnet2(net, node.size = 4, color = c("gray80", "gray20", "gray50"), shape = c(15, 15, 16),
+p_net = ggnet2(net, node.size = 4, color = c("gray80", "black", "gray50"), shape = c(15, 15, 16),
                edge.color = c("black", "black"), edge.size = c(0.8, 0.8), mode = "spring")
 
 #-----------------------------------------------------#
@@ -44,12 +44,12 @@ p_A_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
   stat_function(fun = dnorm, args = list(mean = z[1], sd = 1.2),
                 color = "gray80", size = 1.2) +
   stat_function(fun = dnorm, args = list(mean = z[2], sd = 1.2),
-                color = "gray20", size = 1.2) +
+                color = "black", size = 1.2) +
   stat_function(fun = dnorm, args = list(mean = z[3], sd = 1.2),
                 color = "gray50", size = 1.2) +
   geom_vline(xintercept = theta[1], color = "gray80", size = 0.9,
              linetype = "dashed") +
-  geom_vline(xintercept = theta[2], color = "gray20", size = 0.9,
+  geom_vline(xintercept = theta[2], color = "black", size = 0.9,
              linetype = "dashed") +
   geom_vline(xintercept = theta[3], color = "gray50", size = 0.9,
              linetype = "dashed") +
@@ -67,8 +67,7 @@ matching = MatchingMutNet(n_sp, n_row, n_col, f, z = z,
 
 p_A_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                 height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", direction = -1,
-                     limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.5) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
@@ -90,12 +89,12 @@ p_B_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
   stat_function(fun = dnorm, args = list(mean = z[1], sd = 1.2),
                 color = "gray80", size = 1.2) +
   stat_function(fun = dnorm, args = list(mean = z[2], sd = 1.2),
-                color = "gray20", size = 1.2) +
+                color = "black", size = 1.2) +
   stat_function(fun = dnorm, args = list(mean = z[3], sd = 1.2),
                 color = "gray50", size = 1.2) +
   geom_vline(xintercept = theta[1], color = "gray80", size = 0.9,
              linetype = "dashed") +
-  geom_vline(xintercept = theta[2], color = "gray20", size = 0.9,
+  geom_vline(xintercept = theta[2], color = "black", size = 0.9,
              linetype = "dashed") +
   geom_vline(xintercept = theta[3], color = "gray50", size = 0.9,
              linetype = "dashed") +
@@ -113,8 +112,7 @@ matching = MatchingMutNet(n_sp, n_row, n_col, f, z = z,
 
 p_B_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                          height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", direction = -1,
-                     limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.5) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
@@ -136,12 +134,12 @@ p_C_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
   stat_function(fun = dnorm, args = list(mean = z[1], sd = 1.2),
                 color = "gray80", size = 1.2) +
   stat_function(fun = dnorm, args = list(mean = z[2], sd = 1.2),
-                color = "gray20", size = 1.2) +
+                color = "black", size = 1.2) +
   stat_function(fun = dnorm, args = list(mean = z[3], sd = 1.2),
                 color = "gray50", size = 1.2) +
   geom_vline(xintercept = theta[1], color = "gray80", size = 0.9,
              linetype = "dashed") +
-  geom_vline(xintercept = theta[2], color = "gray20", size = 0.9,
+  geom_vline(xintercept = theta[2], color = "black", size = 0.9,
              linetype = "dashed") +
   geom_vline(xintercept = theta[3], color = "gray50", size = 0.9,
              linetype = "dashed") +
@@ -159,8 +157,7 @@ matching = MatchingMutNet(n_sp, n_row, n_col, f, z = z,
 
 p_C_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                          height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", direction = -1,
-                     limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.5) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
@@ -174,8 +171,7 @@ p_C_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
 # a dummie plot just to get the legend
 p_legend = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                          height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", direction = -1,
-                     limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.6) +
   theme(legend.title = element_text(size = 15),
         legend.text = element_text(size = 13),
@@ -186,14 +182,14 @@ legend = get_legend(p_legend)
 # generating the whole figure
 fig1 = ggdraw() +
   draw_plot(p_A_1, 0, 0.66, 0.8, 0.22) +
-  draw_plot(p_A_2, 0.53, 0.88, 0.1, 0.1) +
-  draw_plot(p_net, 0.22, 0.89, 0.17, 0.08) +
+  draw_plot(p_A_2, 0.58, 0.87, 0.1, 0.1) +
+  draw_plot(p_net, 0.22, 0.88, 0.17, 0.08) +
   draw_plot(p_B_1, 0, 0.33, 0.8, 0.22) +
-  draw_plot(p_B_2, 0.53, 0.55, 0.1, 0.1) +
-  draw_plot(p_net, 0.22, 0.56, 0.17, 0.08) +
+  draw_plot(p_B_2, 0.58, 0.54, 0.1, 0.1) +
+  draw_plot(p_net, 0.22, 0.55, 0.17, 0.08) +
   draw_plot(p_C_1, 0, 0, 0.8, 0.22) +
-  draw_plot(p_C_2, 0.53, 0.22, 0.1, 0.1) +
-  draw_plot(p_net, 0.22, 0.23, 0.17, 0.08) +
+  draw_plot(p_C_2, 0.58, 0.21, 0.1, 0.1) +
+  draw_plot(p_net, 0.22, 0.22, 0.17, 0.08) +
   draw_plot(legend, 0.8, 0.4, 0.25, 0.15) +
   draw_plot_label(c("A", "B", "C"), c(0, 0, 0), c(0.98, 0.65, 0.32), size = 24)
 

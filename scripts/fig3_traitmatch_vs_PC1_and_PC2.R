@@ -41,11 +41,11 @@ summ_final_mut_mat_df$PC2 = rep(rep(network_structure$PC2, each = 2), times = 15
 #------------------------------------------------#
 
 # defining a color palette and ordering according to factor mutualism
-my_palette = c("#00EEEE", "#CD2626", "#4876FF", "#FF7F00", "#A020F0", "#1AB245")
+my_palette = c("#00EEEE", "#CD2626", "#4876FF", "#FF7F00", "#1AB245", "#A020F0")
 
-p_A = ggplot(network_structure, aes(x = PC1, y = PC2, color = mutualism)) +
-  scale_colour_manual(values = my_palette) +
-  geom_point(size = 3, shape = 19) + 
+p_A = ggplot(network_structure, aes(x = PC1, y = PC2, fill = mutualism)) +
+  scale_fill_manual(values = my_palette) +
+  geom_point(size = 3, shape = 21) + 
   xlab("") +
   ylab("") +
   scale_x_continuous(limits = c(-3, 6.2)) +
@@ -60,7 +60,7 @@ p_A = ggplot(network_structure, aes(x = PC1, y = PC2, color = mutualism)) +
 #----------------------------------------------------------------------------------------------#
 
 mod = lm(mean_final_mut_mat ~ PC1 + PC2, 
-         data = subset(summ_final_mut_mat_df, m_A == 0.7 & m_B == 0.7 & g == 0))
+         data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.7 & m_B == 0.7 & g == 0))
 summary(mod)
 pred_values = seq(-3, 6.2, by = 0.1)
 pred = predict(mod, data.frame(PC1 = rep(pred_values, times = length(pred_values)),
@@ -73,11 +73,12 @@ pred_df = data.frame(PC1 = rep(pred_values, times = length(pred_values)),
 p_B = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
   scale_fill_viridis(limits = c(0.48, 0.91)) +
-  geom_point(data = network_structure, aes(x = PC1, y = PC2), size = 3) +
+  geom_point(data = network_structure, aes(x = PC1, y = PC2), 
+             size = 3, shape = 21, fill = "white") +
   scale_x_continuous(limits = c(-3, 6.2)) +
   scale_y_continuous(limits = c(-3, 3)) +
   xlab("") +
-  ylab("Principal component 2 (PC2)") +
+  ylab("Principal component 2 (24.7%)") +
   theme(axis.text.x = element_text(size = 16),
         axis.text.y = element_text(size = 16),
         axis.title = element_text(size = 18),
@@ -88,7 +89,7 @@ p_B = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
 #------------------------------------------------------------------------------------------------#
 
 mod = lm(mean_final_mut_mat ~ PC1 + PC2, 
-         data = subset(summ_final_mut_mat_df, m_A == 0.7 & m_B == 0.7 & g == 0.3))
+         data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.7 & m_B == 0.7 & g == 0.3))
 summary(mod)
 pred_values = seq(-3, 6.2, by = 0.1)
 pred = predict(mod, data.frame(PC1 = rep(pred_values, times = length(pred_values)),
@@ -101,10 +102,11 @@ pred_df = data.frame(PC1 = rep(pred_values, times = length(pred_values)),
 p_C = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
   scale_fill_viridis(limits = c(0.48, 0.91)) +
-  geom_point(data = network_structure, aes(x = PC1, y = PC2), size = 3) +
+  geom_point(data = network_structure, aes(x = PC1, y = PC2),
+             size = 3, shape = 21, fill = "white") +
   scale_x_continuous(limits = c(-3, 6.2)) +
   scale_y_continuous(limits = c(-3, 3)) +
-  xlab("Principal component 1 (PC1)") +
+  xlab("Principal component 1 (59.2%)") +
   ylab("") +
   theme(axis.text.x = element_text(size = 16),
         axis.text.y = element_text(size = 16),
@@ -114,8 +116,7 @@ p_C = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
 # a dummie plot just to get the legend
 p_legend = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
-  scale_fill_viridis(limits = c(0.48, 0.91), direction = -1, 
-                     name = "Trait\nmatching") +
+  scale_fill_viridis(limits = c(0.48, 0.91), name = "Trait\nmatching") +
   theme(legend.title = element_text(size = 14),
         legend.text = element_text(size = 12),
         legend.key.size = unit(0.55, "cm"))
