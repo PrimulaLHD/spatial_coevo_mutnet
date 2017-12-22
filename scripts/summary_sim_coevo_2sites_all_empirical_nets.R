@@ -14,21 +14,21 @@ source("functions/MatchingMutNet.R")
 source("functions/ConvMutNet.R")
 
 # defining mutualistic selection values used in simulations
-m_A = 0.7
-m_B = 0.7
+m_A = 0.3
+m_B = 0.3
 # for the file name
 m_A_char = gsub(".", "", as.character(m_A), fixed = TRUE)
 m_B_char = gsub(".", "", as.character(m_B), fixed = TRUE)
 
 # defining gene flow range used in simulations
 g_min = 0
-g_max = 0.1
+g_max = 0.3
 # for the file name
 g_min_char = gsub(".", "", as.character(g_min), fixed = TRUE)
 g_max_char = gsub(".", "", as.character(g_max), fixed = TRUE)
 
 # defining folder with simulation results 
-folder = paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/",
+folder = paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/theta/thetaA_0-10_thetaB_20-30/",
                "all_networks", "_mA", m_A_char, "_mB", m_B_char, "_g",
                g_min_char, "-", g_max_char, sep = "")
 
@@ -82,7 +82,7 @@ for (i in 1:length(net_names)) {
   mean_final_divergence = c()
   sd_final_divergence = c()
   # reading network
-  mat = as.matrix(read.table(paste("data/empirical_networks/binary/", net_names[i], ".txt", sep = ""), 
+  mat = as.matrix(read.table(paste("data/empirical_networks/sensitivity_analysis/", net_names[i], ".txt", sep = ""), 
                              sep = " ", header = FALSE))
   # defining number of rows, columns and species
   n_row = nrow(mat)
@@ -94,7 +94,7 @@ for (i in 1:length(net_names)) {
   # simulation file names for the current network
   files = dir(paste(folder, "/", net_names[i], sep = ""))
   # extracting g values from the file names
-  split1 = sapply(strsplit(files, split = "_site"), "[", 1)
+  split1 = sapply(strsplit(files, split = "_alpha"), "[", 1)
   g_char = as.character(sub(".*_g", "", split1))
   g_char_point = paste("0", ".", substr(g_char, start = 2, stop = nchar(g_char)),
                        sep = "") 
@@ -102,6 +102,10 @@ for (i in 1:length(net_names)) {
   # extracting site information from the file names
   split2 = sapply(strsplit(files, split = "_sim"), "[", 1)
   site = sub(".*_site", "", split2)
+  # extracting information on additional parameters
+  split3 = sapply(strsplit(files, split = "_site"), "[", 1)
+  add_par = paste("_alpha", as.character(sub(".*_alpha", "", split3)), sep = "")
+  add_par_uni = unique(add_par)
   
   # calculating mutualistic and environmental matching, and divergence
   
@@ -186,12 +190,13 @@ for (i in 1:length(net_names)) {
 }
 
 # defining folder to store summary spreadsheet
-folder_results = "~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/"
+folder_results = "~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/theta/thetaA_0-10_thetaB_20-30/summary_coevo_results/"
 
 # saving results
 write.csv(summary_df, row.names = FALSE, 
           file = paste(folder_results, "summary_coevo_results",
                        "_mA", m_A_char, "_mB", m_B_char,
-                       "_g", g_min_char, "-", g_max_char, ".csv", sep = ""))
+                       "_g", g_min_char, "-", g_max_char,
+                       add_par_uni, ".csv", sep = ""))
 
 #-----------------------------------------------------------------------------------------------------#
