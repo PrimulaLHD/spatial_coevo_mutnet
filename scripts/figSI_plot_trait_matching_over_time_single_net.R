@@ -1,11 +1,12 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#   Reads trait evolution through time data for one network and plots trait matching as a function of
-#   time for different values of mutualistic selection.
+#   Reads trait evolution through time data for one network computes mean reciprocal selection and
+#   plots reciprocal selection and trait matching through time for different values of mutualistic
+#   selection.
 #
 # Returns:
-#   A plot.
+#   Saves the two plots.
 
 # loading functions and packages
 library(ggplot2)
@@ -47,6 +48,8 @@ alpha = 0.2
 m = c()
 # vector to store times to equilibrium
 time = c()
+# vector to store reciprocal selection through time
+mean_rec_sel = c()
 # vector to store trait matching through time
 mean_mut_mat = c()
 # vector to store simulation number
@@ -75,10 +78,18 @@ for (i in 1:length(m_char)) {
     time = c(time, 1:nrow(traits_df))
     for (k in 1:nrow(traits_df)) {
       # traits at time j
-      traits = as.numeric(traits_df[k, ])
+      z = as.numeric(traits_df[k, ])
+      # reciprocal selection
+      z_dif = t(f*z) - f*z # matrix with all trait differences
+      q = f*(exp(-alpha * (z_dif^2))) # calculating matrix q
+      q_n = q / apply(q, 1, sum) # normalizing the matrix
+      q_n_vec = q_n[f != 0]
+      t_q_n_vec = t(q_n)[f != 0]
+      rec_vec = log(q_n_vec) + log(t_q_n_vec) # calculating log of reciprocity
+      mean_rec_sel = c(mean_rec_sel, mean(rec_vec)) # mean reciprocity for the network
       # trait matching
       mut_mat = MatchingMutNet(n_sp = n_sp, n_row = n_row, n_col = n_col, f = f,
-                               z = traits, method = "exponential", alpha = alpha)
+                               z = z, method = "exponential", alpha = alpha)
       mean_mut_mat = c(mean_mut_mat, mut_mat[[1]])
     }
     
@@ -90,18 +101,37 @@ for (i in 1:length(m_char)) {
   results_df = data.frame(m = m,
                           simulation = simulation,
                           time = time,
+                          mean_rec_sel = mean_rec_sel,
                           mean_mut_mat = mean_mut_mat)
   
 }
 
-ggplot(data = subset(results_df, time < 30), 
-       mapping = aes(x = time, y = mean_mut_mat, group = simulation)) +
-  geom_line(size = 0.8, color = "black", alpha = 0.5) +
+
+p_A = ggplot(data = subset(results_df, time < 30), 
+             mapping = aes(x = time, y = mean_rec_sel, group = simulation)) +
+  geom_line(size = 1, color = "black", alpha = 0.5) +
+  xlab("Time") +
+  ylab("Mean selection reciprocity (log)") +
+  facet_grid( ~ m, labeller = label_both, scales = "free") +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 14))
+  
+p_B = ggplot(data = subset(results_df, time < 30), 
+             mapping = aes(x = time, y = mean_mut_mat, group = simulation)) +
+  geom_line(size = 1, color = "black", alpha = 0.5) +
   xlab("Time") +
   ylab("Mean trait matching") +
   facet_grid( ~ m, labeller = label_both, scales = "free") +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
         axis.title = element_text(size = 14))
+
+figSI = plot_grid(p_A, p_B, labels = c("A", "B"), label_size = 22, 
+                  nrow = 2, align = "v")
+
+save_plot("figSI.pdf", figSI,
+          ncol = 1, nrow = 2,
+          base_aspect_ratio = 3)
 
 #-----------------------------------------------------------------------------------------------------#
