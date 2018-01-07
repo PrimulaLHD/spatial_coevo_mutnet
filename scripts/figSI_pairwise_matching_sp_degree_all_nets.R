@@ -21,33 +21,37 @@ library(viridis)
 final_mut_mat_df_all_nets_g0 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA07_mB07_g0_siteA.csv")
 final_mut_mat_df_all_nets_g03 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA07_mB07_g03_siteA.csv")
 
-# computing difference in trait matching between high and low gene flow
-final_mut_mat_df_all_nets = final_mut_mat_df_all_nets_g0
-final_mut_mat_df_all_nets$dif_matching = final_mut_mat_df_all_nets_g03$matching - final_mut_mat_df_all_nets_g0$matching
-
 # reading network structure data
 net_struct = read.csv("output/data/network_structure/network_structure.csv")
-# adding mutualism type
-n_sim = 100
-final_mut_mat_df_all_nets$mutualism = rep(net_struct$mutualism, n_sim*net_struct$interactions)
-
 # changing mutualism names
-final_mut_mat_df_all_nets$mutualism = as.character(final_mut_mat_df_all_nets$mutualism)
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "AE"] = "ants-nectary-bearing plants"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "AM"] = "ants-myrmecophytes"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "CC"] = "marine cleaning"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "FA"] = "anemones-anemonefishes"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "FP"] = "seed dispersal"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "PP"] = "pollination"
+net_struct$mutualism = as.character(net_struct$mutualism)
+net_struct$mutualism[net_struct$mutualism == "AE"] = "ants-nectary-bearing plants"
+net_struct$mutualism[net_struct$mutualism == "AM"] = "ants-myrmecophytes"
+net_struct$mutualism[net_struct$mutualism == "CC"] = "marine cleaning"
+net_struct$mutualism[net_struct$mutualism == "FA"] = "anemones-anemonefishes"
+net_struct$mutualism[net_struct$mutualism == "FP"] = "seed dispersal"
+net_struct$mutualism[net_struct$mutualism == "PP"] = "pollination"
 
 # computing mean trait matching difference for each species pair across simulations
-summ_final_dif_matching = ddply(final_mut_mat_df_all_nets, c("network", "interaction"),
-                                summarize, mean_dif_matching = mean(dif_matching),
-                                mutualism = unique(mutualism),
-                                col = unique(col),
-                                row = unique(row),
-                                k_col = unique(k_col),
-                                k_row = unique(k_row))
+summ_final_mut_matching_g0 = ddply(final_mut_mat_df_all_nets_g0, c("network", "interaction"),
+                                   summarize, mean_matching = mean(matching),
+                                   col = unique(col),
+                                   row = unique(row),
+                                   k_col = unique(k_col),
+                                   k_row = unique(k_row))
+summ_final_mut_matching_g03 = ddply(final_mut_mat_df_all_nets_g03, c("network", "interaction"),
+                                    summarize, mean_matching = mean(matching),
+                                    col = unique(col),
+                                    row = unique(row),
+                                    k_col = unique(k_col),
+                                    k_row = unique(k_row))
+
+# creating new data frame
+summ_final_dif_matching = summ_final_mut_matching_g0[ , c("network", "interaction", "col", "row", "k_col", "k_row")]
+# computing difference in trait matching with and without gene flow
+summ_final_dif_matching$mean_dif_matching = summ_final_mut_matching_g03$mean_matching - summ_final_mut_matching_g0$mean_matching
+# adding mutualism type
+summ_final_dif_matching$mutualism = rep(net_struct$mutualism, net_struct$interactions)
 
 # plotting 
 p_A = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40), 
@@ -73,33 +77,26 @@ p_A = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40),
 final_mut_mat_df_all_nets_g0 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA09_mB01_g0_siteA.csv")
 final_mut_mat_df_all_nets_g03 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA09_mB01_g03_siteA.csv")
 
-# computing difference in trait matching between high and low gene flow
-final_mut_mat_df_all_nets = final_mut_mat_df_all_nets_g0
-final_mut_mat_df_all_nets$dif_matching = final_mut_mat_df_all_nets_g03$matching - final_mut_mat_df_all_nets_g0$matching
-
-# reading network structure data
-net_struct = read.csv("output/data/network_structure/network_structure.csv")
-# adding mutualism type
-n_sim = 100
-final_mut_mat_df_all_nets$mutualism = rep(net_struct$mutualism, n_sim*net_struct$interactions)
-
-# changing mutualism names
-final_mut_mat_df_all_nets$mutualism = as.character(final_mut_mat_df_all_nets$mutualism)
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "AE"] = "ants-nectary-bearing plants"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "AM"] = "ants-myrmecophytes"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "CC"] = "marine cleaning"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "FA"] = "anemones-anemonefishes"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "FP"] = "seed dispersal"
-final_mut_mat_df_all_nets$mutualism[final_mut_mat_df_all_nets$mutualism == "PP"] = "pollination"
-
 # computing mean trait matching difference for each species pair across simulations
-summ_final_dif_matching = ddply(final_mut_mat_df_all_nets, c("network", "interaction"),
-                                summarize, mean_dif_matching = mean(dif_matching),
-                                mutualism = unique(mutualism),
-                                col = unique(col),
-                                row = unique(row),
-                                k_col = unique(k_col),
-                                k_row = unique(k_row))
+summ_final_mut_matching_g0 = ddply(final_mut_mat_df_all_nets_g0, c("network", "interaction"),
+                                   summarize, mean_matching = mean(matching),
+                                   col = unique(col),
+                                   row = unique(row),
+                                   k_col = unique(k_col),
+                                   k_row = unique(k_row))
+summ_final_mut_matching_g03 = ddply(final_mut_mat_df_all_nets_g03, c("network", "interaction"),
+                                    summarize, mean_matching = mean(matching),
+                                    col = unique(col),
+                                    row = unique(row),
+                                    k_col = unique(k_col),
+                                    k_row = unique(k_row))
+
+# creating new data frame
+summ_final_dif_matching = summ_final_mut_matching_g0[ , c("network", "interaction", "col", "row", "k_col", "k_row")]
+# computing difference in trait matching with and without gene flow
+summ_final_dif_matching$mean_dif_matching = summ_final_mut_matching_g03$mean_matching - summ_final_mut_matching_g0$mean_matching
+# adding mutualism type
+summ_final_dif_matching$mutualism = rep(net_struct$mutualism, net_struct$interactions)
 
 # plotting 
 p_B = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40), 
