@@ -17,8 +17,6 @@ library(scales)
 
 # network structure data
 network_structure = read.csv("output/data/network_structure/network_structure.csv")
-network_structure$PC1 = -network_structure$PC1
-network_structure$PC2 = -network_structure$PC2
 
 # simulation data
 summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
@@ -41,15 +39,15 @@ summ_final_mut_mat_df$PC2 = rep(rep(network_structure$PC2, each = 2), times = 15
 #------------------------------------------------#
 
 # defining a color palette and ordering according to factor mutualism
-my_palette = c("#00EEEE", "#CD2626", "#4876FF", "#FF7F00", "#1AB245", "#A020F0")
+my_palette = c("#00EEEE", "#CD2626", "#4876FF", "#FF7F00", "#A020F0", "#1AB245")
 
 p_A = ggplot(network_structure, aes(x = PC1, y = PC2, fill = mutualism)) +
   scale_fill_manual(values = my_palette) +
   geom_point(size = 3, shape = 21) + 
   xlab("") +
   ylab("") +
-  scale_x_continuous(limits = c(-3, 6.2)) +
-  scale_y_continuous(limits = c(-3, 3)) +
+  scale_x_continuous(limits = c(-3, 4)) +
+  scale_y_continuous(limits = c(-3, 4)) +
   theme(axis.text.x = element_text(size = 16),
         axis.text.y = element_text(size = 16),
         axis.title = element_text(size = 18),
@@ -62,7 +60,7 @@ p_A = ggplot(network_structure, aes(x = PC1, y = PC2, fill = mutualism)) +
 mod = lm(mean_final_mut_mat ~ PC1 + PC2, 
          data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.7 & m_B == 0.7 & g == 0))
 summary(mod)
-pred_values = seq(-3, 6.2, by = 0.1)
+pred_values = seq(-3, 4, by = 0.1)
 pred = predict(mod, data.frame(PC1 = rep(pred_values, times = length(pred_values)),
                                PC2 = rep(pred_values, each = length(pred_values))))
 
@@ -72,13 +70,13 @@ pred_df = data.frame(PC1 = rep(pred_values, times = length(pred_values)),
 
 p_B = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
-  scale_fill_viridis(limits = c(0.48, 0.91)) +
+  scale_fill_viridis(limits = c(0.49, 0.93)) +
   geom_point(data = network_structure, aes(x = PC1, y = PC2), 
              size = 3, shape = 21, fill = "white") +
-  scale_x_continuous(limits = c(-3, 6.2)) +
-  scale_y_continuous(limits = c(-3, 3)) +
+  scale_x_continuous(limits = c(-3, 4)) +
+  scale_y_continuous(limits = c(-3, 4)) +
   xlab("") +
-  ylab("Principal component 2 (24.7%)") +
+  ylab("Principal component 2 (32.4%)") +
   theme(axis.text.x = element_text(size = 16),
         axis.text.y = element_text(size = 16),
         axis.title = element_text(size = 18),
@@ -91,7 +89,7 @@ p_B = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
 mod = lm(mean_final_mut_mat ~ PC1 + PC2, 
          data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.7 & m_B == 0.7 & g == 0.3))
 summary(mod)
-pred_values = seq(-3, 6.2, by = 0.1)
+pred_values = seq(-3, 4, by = 0.1)
 pred = predict(mod, data.frame(PC1 = rep(pred_values, times = length(pred_values)),
                                PC2 = rep(pred_values, each = length(pred_values))))
 
@@ -101,12 +99,12 @@ pred_df = data.frame(PC1 = rep(pred_values, times = length(pred_values)),
 
 p_C = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
-  scale_fill_viridis(limits = c(0.48, 0.91)) +
+  scale_fill_viridis(limits = c(0.49, 0.93)) +
   geom_point(data = network_structure, aes(x = PC1, y = PC2),
              size = 3, shape = 21, fill = "white") +
-  scale_x_continuous(limits = c(-3, 6.2)) +
-  scale_y_continuous(limits = c(-3, 3)) +
-  xlab("Principal component 1 (59.2%)") +
+  scale_x_continuous(limits = c(-3, 4)) +
+  scale_y_continuous(limits = c(-3, 4)) +
+  xlab("Principal component 1 (60.9%)") +
   ylab("") +
   theme(axis.text.x = element_text(size = 16),
         axis.text.y = element_text(size = 16),
@@ -116,7 +114,7 @@ p_C = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
 # a dummie plot just to get the legend
 p_legend = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
-  scale_fill_viridis(limits = c(0.48, 0.91), name = "Trait\nmatching") +
+  scale_fill_viridis(limits = c(0.49, 0.93), name = "Predicted\nmean trait\nmatching") +
   theme(legend.title = element_text(size = 14),
         legend.text = element_text(size = 12),
         legend.key.size = unit(0.55, "cm"))
