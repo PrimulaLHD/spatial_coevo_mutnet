@@ -24,9 +24,9 @@ p_A_1 = ggplot(data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.7 & m
                aes(x = g, y = mean_final_mut_mat)) +
   geom_errorbar(aes(ymin = lower_lim_final_mut_mat, ymax = upper_lim_final_mut_mat), 
                 width = 0.004, size = 0.5) +
-  geom_point(size = 4, shape = 21, fill = "#1AB245") + 
+  geom_point(size = 4, shape = 21, fill = "gray70") + 
   xlab("Mean gene flow") +
-  ylab("Mean trait matching") +
+  ylab("Mean trait matching at hotspot") +
   scale_y_continuous(limits = c(0.5, 1)) +
   theme(axis.text.x = element_text(size = 13),
         axis.text.y = element_text(size = 13),
@@ -109,9 +109,9 @@ p_B_1 = ggplot(data = subset(summ_final_mut_mat_df, site == "A" & m_A == 0.9 & m
                aes(x = g, y = mean_final_mut_mat)) +
   geom_errorbar(aes(ymin = lower_lim_final_mut_mat, ymax = upper_lim_final_mut_mat), 
                 width = 0.004, size = 0.5) +
-  geom_point(size = 4, shape = 21, fill = "#1AB245") + 
+  geom_point(size = 4, shape = 21, fill = "gray70") + 
   xlab("Mean gene flow") +
-  ylab("Mean trait matching") +
+  ylab("Mean trait matching at hotspot") +
   scale_y_continuous(limits = c(0.5, 1)) +
   theme(axis.text.x = element_text(size = 13),
         axis.text.y = element_text(size = 13),
