@@ -69,7 +69,7 @@ my_palette = c(orange, red, cyan, blue, green, purple)
 # Fig A: mean final trait matching as a function of gene flow for site A
 p_A = ggplot(data = subset(summ_final_mut_mat_df, site == "A"),
              aes(x = g, y = mean_final_mut_mat, color = mutualism)) +
-  geom_point(size = 0.6, shape = 19, alpha = 0.5) + 
+  geom_point(size = 0.5, shape = 19, alpha = 0.5) + 
   scale_color_manual(values = my_palette) +
   xlab("Mean gene flow") +
   ylab("Mean trait matching at site A") +
