@@ -21,7 +21,7 @@ network_structure$mutualism[network_structure$mutualism == "FP"] = "SD"
 network_structure$mutualism[network_structure$mutualism == "PP"] = "P"
 
 # removing some variables
-network_structure = network_structure[ , c(1, 2, 3, 4, 5, 7, 8, 10, 13, 15, 16)]
+network_structure = network_structure[ , c(1, 2, 3, 4, 5, 7, 9, 12, 15, 16)]
 # ordering according to mutualism type
 network_structure = network_structure[order(network_structure$mutualism), ]
 
