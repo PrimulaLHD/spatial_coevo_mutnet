@@ -72,7 +72,7 @@ for (i in 1:length(net_names)) {
 # Principal components analysis
 net_struct = data.frame(network, mutualism, rows, columns, richness, interactions, connectance, degree_variance,
                         nestedness, std_nestedness, p_nestedness, modularity, std_modularity, p_modularity)
-mat = as.matrix(net_struct[ , c("richness", "connectance", "degree_variance", "std_nestedness", "std_modularity")])
+mat = as.matrix(net_struct[ , c("richness", "connectance", "nestedness", "modularity")])
 pca = prcomp(x = mat, scale = TRUE) # performing pca
 pc_sd = pca[[1]]
 pc_eigens = pc_sd^2
