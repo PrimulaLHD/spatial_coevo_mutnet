@@ -58,8 +58,8 @@ p_A = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40),
              aes(x = k_col, y = k_row, color = mean_dif_matching)) +
   geom_point(size = 1.8, alpha = 0.7) +
   facet_wrap( ~ mutualism) +
-  xlab("First species standardized degree") +
-  ylab("Second species\nstandardized degree") +
+  xlab("First species degree") +
+  ylab("Second species degree") +
   scale_color_viridis(name = "Mean difference in\npairwise trait matching") +
   theme(axis.text.x = element_text(size = 11),
         axis.text.y = element_text(size = 11),
@@ -103,8 +103,8 @@ p_B = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40),
              aes(x = k_col, y = k_row, color = mean_dif_matching)) +
   geom_point(size = 1.8, alpha = 0.7) +
   facet_wrap( ~ mutualism) +
-  xlab("First species standardized degree") +
-  ylab("Second species\nstandardized degree") +
+  xlab("First species degree") +
+  ylab("Second species degree") +
   scale_color_viridis(name = "Mean difference in\npairwise trait matching",
                       direction = -1) +
   theme(axis.text.x = element_text(size = 11),
