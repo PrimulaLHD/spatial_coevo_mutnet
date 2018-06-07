@@ -5,6 +5,7 @@
 #
 # Returns:
 #   
+install.packages(c("ggplot2", "cowplot", "viridis", "GGally", "network", "sna", "scales", "ggnetwork"))
 
 library(ggplot2)
 library(cowplot)
@@ -37,15 +38,15 @@ p_net = ggnet2(net, node.size = 4, color = c("gray80", "black", "gray50"), shape
 # Fig. 1A: intermediate trait matching - no gene flow #
 #-----------------------------------------------------#
 
-z = c(3.7, 6, 4.7)
+z = c(3.6, 6.1, 4.7)
 
 # trait distributions
 p_A_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
-  stat_function(fun = dnorm, args = list(mean = z[1], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[1], sd = 0.7),
                 color = "gray80", size = 1.2) +
-  stat_function(fun = dnorm, args = list(mean = z[2], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[2], sd = 0.7),
                 color = "black", size = 1.2) +
-  stat_function(fun = dnorm, args = list(mean = z[3], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[3], sd = 0.7),
                 color = "gray50", size = 1.2) +
   geom_vline(xintercept = theta[1], color = "gray80", size = 0.9,
              linetype = "dashed") +
@@ -53,7 +54,7 @@ p_A_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
              linetype = "dashed") +
   geom_vline(xintercept = theta[3], color = "gray50", size = 0.9,
              linetype = "dashed") +
-  scale_x_continuous(limits = c(0, 17)) +
+  scale_x_continuous(limits = c(0, 10)) +
   xlab("Trait value") +
   ylab("Density") +
   theme(axis.text.x = element_text(size = 13),
@@ -67,7 +68,7 @@ matching = MatchingMutNet(n_sp, n_row, n_col, f, z = z,
 
 p_A_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                 height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.5) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
@@ -82,15 +83,15 @@ p_A_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
 # Fig. 1B: low trait matching - with gene flow #
 #----------------------------------------------#
 
-z = c(8, 13, 10)
+z = c(4.2, 5.9, 8.2)
 
 # trait distributions
 p_B_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
-  stat_function(fun = dnorm, args = list(mean = z[1], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[1], sd = 0.7),
                 color = "gray80", size = 1.2) +
-  stat_function(fun = dnorm, args = list(mean = z[2], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[2], sd = 0.7),
                 color = "black", size = 1.2) +
-  stat_function(fun = dnorm, args = list(mean = z[3], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[3], sd = 0.7),
                 color = "gray50", size = 1.2) +
   geom_vline(xintercept = theta[1], color = "gray80", size = 0.9,
              linetype = "dashed") +
@@ -98,7 +99,7 @@ p_B_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
              linetype = "dashed") +
   geom_vline(xintercept = theta[3], color = "gray50", size = 0.9,
              linetype = "dashed") +
-  scale_x_continuous(limits = c(0, 17)) +
+  scale_x_continuous(limits = c(0, 10)) +
   xlab("Trait value") +
   ylab("Density") +
   theme(axis.text.x = element_text(size = 13),
@@ -112,7 +113,7 @@ matching = MatchingMutNet(n_sp, n_row, n_col, f, z = z,
 
 p_B_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                          height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.5) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
@@ -127,15 +128,15 @@ p_B_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
 # Fig. 1C: high trait matching - with gene flow #
 #-----------------------------------------------#
 
-z = c(9.8, 10.5, 10)
+z = c(5.3, 5.7, 6)
 
 # trait distributions
 p_C_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
-  stat_function(fun = dnorm, args = list(mean = z[1], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[1], sd = 0.7),
                 color = "gray80", size = 1.2) +
-  stat_function(fun = dnorm, args = list(mean = z[2], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[2], sd = 0.7),
                 color = "black", size = 1.2) +
-  stat_function(fun = dnorm, args = list(mean = z[3], sd = 1.2),
+  stat_function(fun = dnorm, args = list(mean = z[3], sd = 0.7),
                 color = "gray50", size = 1.2) +
   geom_vline(xintercept = theta[1], color = "gray80", size = 0.9,
              linetype = "dashed") +
@@ -143,7 +144,7 @@ p_C_1 = ggplot(data = data.frame(x = c(-3, 3)), aes(x)) +
              linetype = "dashed") +
   geom_vline(xintercept = theta[3], color = "gray50", size = 0.9,
              linetype = "dashed") +
-  scale_x_continuous(limits = c(0, 17)) +
+  scale_x_continuous(limits = c(0, 10)) +
   xlab("Trait value") +
   ylab("Density") +
   theme(axis.text.x = element_text(size = 13),
@@ -157,7 +158,7 @@ matching = MatchingMutNet(n_sp, n_row, n_col, f, z = z,
 
 p_C_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                          height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.5) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
@@ -171,7 +172,7 @@ p_C_2 = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
 # a dummie plot just to get the legend
 p_legend = ggplot(data = matching[[2]], aes(x = column, y = row, fill = matching,
                                          height = 0.95, width = 0.9)) + 
-  scale_fill_viridis(option = "plasma", limits = c(0.15, 1), name = "Trait\nmatching") +
+  scale_fill_viridis(option = "plasma", limits = c(0, 1), name = "Trait\nmatching") +
   geom_tile(color = "black", size = 0.6) +
   theme(legend.title = element_text(size = 15),
         legend.text = element_text(size = 13),
