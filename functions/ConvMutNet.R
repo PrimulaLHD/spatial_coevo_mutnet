@@ -23,8 +23,16 @@ ConvMutNet = function(n_sp, n_row, n_col, z, method, alpha) {
   
   z_row = z[1:n_row] # z values of row species 
   z_col = z[(n_row+1):n_sp] # z values of column species
-  pair_diff_row = abs(combn(z_row, 2, FUN = diff)) # all possible pairwise differences between row species
-  pair_diff_col = abs(combn(z_col, 2, FUN = diff)) # all possible pairwise differences between column species
+  if(length(z_row) > 1) {
+    pair_diff_row = abs(combn(z_row, 2, FUN = diff)) # all possible pairwise differences between row species
+  } else {
+    pair_diff_row = NA
+  }
+  if (length(z_col) > 1) {
+    pair_diff_col = abs(combn(z_col, 2, FUN = diff)) # all possible pairwise differences between column species
+  } else {
+    pair_diff_col = NA
+  }
   # Guimarães et al. (2011) metric
   if (method == "guimaraes") {
     conv_guima = c(-log(mean(pair_diff_row)), -log(mean(pair_diff_col)))
