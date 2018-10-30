@@ -1,10 +1,12 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#
+#  Generates Fig. 4 of the paper, which shows how the gradual disruption of gene flow in mutualistic
+#  networks would affect the evolution of trait matching using an analytical approximation of the 
+#  coevolutionary model.
 #
 # Returns:
-#   
+#  Saves the figure as a pdf file.    
 
 # loading functions and packages
 library(plyr)
@@ -12,7 +14,7 @@ library(ggplot2)
 library(cowplot)
 
 # defining folder with results
-result_files = dir("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_geneflow_removal/")
+result_files = dir("output/data/simulations_empirical_networks/summary_coevo_results/simulations_geneflow_removal")
 
 # selecting the files with the desired gene flow values
 result_files = result_files[grep("g03-0.csv", result_files)]
@@ -31,7 +33,7 @@ net_names_bin = gsub("wgt", "bin", net_names)
 summ_df = c()
 
 for (i in 1:length(result_files)) {
-  current_df = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_geneflow_removal/", 
+  current_df = read.csv(paste("output/data/simulations_empirical_networks/summary_coevo_results/simulations_geneflow_removal/", 
                               result_files[i], sep = ""))
   
   curr_summ_df = ddply(current_df, c("pert", "m_A", "m_B"),
@@ -75,14 +77,14 @@ fig4 = ggplot(data = subset(summ_df, m_A == 0.5 & m_B == 0.5),
   scale_color_manual(values = my_palette) +
   xlab("Fraction of species without gene flow") +
   ylab("Mean trait matching") +
-  theme(axis.text.x = element_text(size = 13),
-        axis.text.y = element_text(size = 13),
-        axis.title = element_text(size = 15),
-        legend.key.size = unit(0.5, "cm"),
-        legend.text = element_text(size = 11),
+  theme(axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        axis.title = element_text(size = 22),
+        legend.key.size = unit(0.6, "cm"),
+        legend.text = element_text(size = 18),
         legend.title = element_blank())
 
 # saving
-save_plot("fig4.pdf", fig4, ncol = 1, nrow = 1, base_aspect_ratio = 1.8)
+save_plot("output/figs/fig4.pdf", fig4, ncol = 1, nrow = 1, base_aspect_ratio = 2.2)
 
 #-----------------------------------------------------------------------------------------------------#

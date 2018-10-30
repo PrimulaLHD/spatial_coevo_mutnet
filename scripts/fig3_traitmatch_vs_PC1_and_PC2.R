@@ -1,10 +1,11 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#   
+#  Generates Fig. 3 of the paper, which shows how network structure mediates the effects of gene flow 
+#  on the emergence of trait matching for 72 mutualistic networks.
 #
 # Returns:
-#   
+#  Saves the figure as a pdf file.  
 
 # loading functions and packages
 library(ggplot2)
@@ -19,7 +20,7 @@ library(scales)
 network_structure = read.csv("output/data/network_structure/network_structure.csv")
 
 # simulation data
-summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
+summ_final_mut_mat_df = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
 
 # changing mutualism names
 summ_final_mut_mat_df$mutualism = as.character(summ_final_mut_mat_df$mutualism)
@@ -48,9 +49,9 @@ p_A = ggplot(network_structure, aes(x = PC1, y = PC2, fill = mutualism)) +
   ylab("") +
   scale_x_continuous(limits = c(-3, 4)) +
   scale_y_continuous(limits = c(-3, 4)) +
-  theme(axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.title = element_text(size = 18),
+  theme(axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        axis.title = element_text(size = 22),
         legend.position = "none")
 
 #----------------------------------------------------------------------------------------------#
@@ -77,9 +78,9 @@ p_B = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   scale_y_continuous(limits = c(-3, 4)) +
   xlab("") +
   ylab("Principal component 2 (32.4%)") +
-  theme(axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.title = element_text(size = 18),
+  theme(axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        axis.title = element_text(size = 22),
         legend.position = "none")
 
 #------------------------------------------------------------------------------------------------#
@@ -106,18 +107,18 @@ p_C = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   scale_y_continuous(limits = c(-3, 4)) +
   xlab("Principal component 1 (60.9%)") +
   ylab("") +
-  theme(axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.title = element_text(size = 18),
+  theme(axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        axis.title = element_text(size = 22),
         legend.position = "none")
 
 # a dummie plot just to get the legend
 p_legend = ggplot(data = pred_df, aes(x = PC1, y = PC2)) +
   geom_tile(aes(fill = matching)) +
   scale_fill_viridis(limits = c(0.49, 0.93), name = "Predicted\nmean trait\nmatching") +
-  theme(legend.title = element_text(size = 14),
-        legend.text = element_text(size = 12),
-        legend.key.size = unit(0.55, "cm"))
+  theme(legend.title = element_text(size = 20),
+        legend.text = element_text(size = 18),
+        legend.key.size = unit(0.6, "cm"))
 
 legend = get_legend(p_legend)
 
@@ -157,9 +158,9 @@ fig3 = ggdraw() +
   draw_plot(p_net_izzo, 0, 0.73, 0.2, 0.2) +
   draw_plot(p_net_galetti, 0.76, 0.71, 0.24, 0.24) +
   draw_plot(legend, 0.82, 0.3, 0.1, 0.1) +
-  draw_plot_label(c("A", "B", "C"), c(0.1, 0.1, 0.1), c(1, 0.7, 0.38), size = 24)
+  draw_plot_label(c("A", "B", "C"), c(0.1, 0.1, 0.1), c(1, 0.7, 0.38), size = 26)
 
 # saving
-save_plot("fig3.pdf", fig3, ncol = 1, nrow = 3, base_aspect_ratio = 2.2)
+save_plot("output/figs/fig3.pdf", fig3, ncol = 1, nrow = 3, base_aspect_ratio = 2.2)
 
 #-----------------------------------------------------------------------------------------------------#
