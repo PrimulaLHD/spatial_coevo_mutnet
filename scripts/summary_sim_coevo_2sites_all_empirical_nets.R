@@ -14,8 +14,8 @@ source("functions/MatchingMutNet.R")
 source("functions/ConvMutNet.R")
 
 # defining mutualistic selection values used in simulations
-m_A = 0.3
-m_B = 0.3
+m_A = 0.7
+m_B = 0.7
 # for the file name
 m_A_char = gsub(".", "", as.character(m_A), fixed = TRUE)
 m_B_char = gsub(".", "", as.character(m_B), fixed = TRUE)
@@ -28,7 +28,7 @@ g_min_char = gsub(".", "", as.character(g_min), fixed = TRUE)
 g_max_char = gsub(".", "", as.character(g_max), fixed = TRUE)
 
 # defining folder with simulation results 
-folder = paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/theta/thetaA_0-10_thetaB_20-30/",
+folder = paste("output/data/simulations_empirical_networks/",
                "all_networks", "_mA", m_A_char, "_mB", m_B_char, "_g",
                g_min_char, "-", g_max_char, sep = "")
 
@@ -61,9 +61,6 @@ summary_df = data.frame(network = rep(net_names, each = n_sim),
                         sd_final_divergence = rep(NA, length(net_names)*n_sim))
 
 for (i in 1:length(net_names)) {
-  
-  print(net_names[i])
-  
   # creating vectors to store results
   mean_init_mut_matching = c()
   sd_init_mut_matching = c()
@@ -82,7 +79,7 @@ for (i in 1:length(net_names)) {
   mean_final_divergence = c()
   sd_final_divergence = c()
   # reading network
-  mat = as.matrix(read.table(paste("data/empirical_networks/sensitivity_analysis/", net_names[i], ".txt", sep = ""), 
+  mat = as.matrix(read.table(paste("data/empirical_networks/binary/", net_names[i], ".txt", sep = ""), 
                              sep = " ", header = FALSE))
   # defining number of rows, columns and species
   n_row = nrow(mat)
@@ -190,7 +187,7 @@ for (i in 1:length(net_names)) {
 }
 
 # defining folder to store summary spreadsheet
-folder_results = "~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/theta/thetaA_0-10_thetaB_20-30/summary_coevo_results/"
+folder_results = "output/data/simulations_empirical_networks/summary_coevo_results/"
 
 # saving results
 write.csv(summary_df, row.names = FALSE, 

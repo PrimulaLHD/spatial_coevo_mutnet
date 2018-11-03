@@ -15,7 +15,7 @@ net_files = dir("data/empirical_networks/weighted/")
 net_names = substr(net_files, start = 1, stop = nchar(net_files) - 4) 
 
 # defining folder to store results
-folder = "~/Desktop/Lucas_updated/output/data/simulations_geneflow_removal"
+folder = "output/data/simulations_empirical_networks/simulations_geneflow_removal"
 
 # define m_A and m_B sequences
 m_df = expand.grid(seq(0.1, 0.9, 0.2), seq(0.1, 0.9, 0.2))
@@ -41,9 +41,6 @@ n_theta = 10
 n_rep_pert = 10
 
 for(i in 1:length(net_files)) {
-  
-  print(net_names[i])
-  
   # read empirical matrix
   mat = as.matrix(read.table(paste("data/empirical_networks/weighted/", net_files[i], sep = ""), 
                              sep = " ", header = FALSE))
@@ -87,9 +84,6 @@ for(i in 1:length(net_files)) {
     m_A = rep(m_df$mA[j], n_sp)
     m_B = rep(m_df$mB[j], n_sp)
     M = diag(c(m_A, m_B))
-    
-    print(m_df$mA[j])
-    print(m_df$mB[j])
     
     for (k in 1:n_rep_pert) {
       

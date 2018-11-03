@@ -1,8 +1,9 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#   Runs n_sim simulations per empirical network for several different mean gene flow values (g) using
-#   a given choice of parameters.
+#   Runs n_sim simulations of the coevolutionary model per empirical network for several different 
+#   mean gene flow values (g) using a given choice of parameters. In these simulations, we impose
+#   a positive correlation between gene flow and species degree.
 #
 # Returns:
 #   Saves two csv files (one for each site) containing the environmental optimum values in the first row,

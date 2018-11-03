@@ -1,22 +1,17 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#   Runs n_sim simulations per empirical network for several different mean gene flow values (g) using
-#   a given choice of parameters and removing species independently at both sites based on degree.
+#   Runs n_sim simulations of the coevolutionary model per empirical network for several different 
+#   mean gene flow values (g) using a given choice of parameters. In these simulations we remove 
+#   species independently at both sites based on species degree before performing the simulation.
 #
 # Returns:
 #   Saves two csv files (one for each site) containing the environmental optimum values in the first row,
 #   the initial trait values in the second row, and the final trait values in the third row.
 
 # loading functions
-source("functions/CoevoMutNet2Sites.R")
+source("functions/CoevoMutNet2SitesTurnover.R")
 source("functions/RemoveNodesNoLinks.R")
-
-
-
-prop_removed = c()
-
-
 
 # defining number of simulations per network
 n_sim = 50
@@ -155,11 +150,6 @@ for (i in 1:length(net_files)) {
       sp_rem_A = which(degree_std < runif(n_sp, 0, 1))
       sp_rem_B = which(degree_std < runif(n_sp, 0, 1))
       
-      
-      prop_removed_A = 0
-      prop_removed_B = 0
-      
-      
       if (length(sp_rem_A) > 0) {
         # removing species from matrix
         f_A = f_A[-sp_rem_A, -sp_rem_A]
@@ -174,9 +164,6 @@ for (i in 1:length(net_files)) {
         theta_A = theta_A[sp_labels_A]
         init_A = init_A[sp_labels_A]
         m_A = m_A[sp_labels_A]
-        
-        prop_removed_A = (n_sp - n_sp_A)/n_sp
-        
       }
       
       if (length(sp_rem_B) > 0) {
@@ -193,19 +180,14 @@ for (i in 1:length(net_files)) {
         theta_B = theta_B[sp_labels_B]
         init_B = init_B[sp_labels_B]
         m_B = m_B[sp_labels_B] 
-        
-        prop_removed_B = (n_sp - n_sp_B)/n_sp
-        
       }
       
-      prop_removed = c(prop_removed, prop_removed_A, prop_removed_B)
-      
       # running simulation
-      z_list = CoevoMutNet2Sites(n_sp_A = n_sp_A, n_sp_B = n_sp_B, sp_labels_A = sp_labels_A, 
-                                 sp_labels_B = sp_labels_B, f_A = f_A, f_B = f_B, 
-                                 g_A = g_A, g_B = g_B, alpha = alpha, phi_A = phi_A, phi_B = phi_B,
-                                 theta_A = theta_A, theta_B = theta_B, init_A = init_A, init_B = init_B, 
-                                 m_A = m_A, m_B = m_B, epsilon = epsilon, t_max = t_max)
+      z_list = CoevoMutNet2SitesTurnover(n_sp_A = n_sp_A, n_sp_B = n_sp_B, sp_labels_A = sp_labels_A, 
+                                         sp_labels_B = sp_labels_B, f_A = f_A, f_B = f_B, 
+                                         g_A = g_A, g_B = g_B, alpha = alpha, phi_A = phi_A, phi_B = phi_B,
+                                         theta_A = theta_A, theta_B = theta_B, init_A = init_A, init_B = init_B, 
+                                         m_A = m_A, m_B = m_B, epsilon = epsilon, t_max = t_max)
       
       # initial traits
       z_A_init = z_list[[1]][1, ]

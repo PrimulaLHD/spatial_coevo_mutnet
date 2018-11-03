@@ -1,8 +1,9 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#   Runs n_sim simulations per empirical network for several different mean gene flow values (g) using
-#   a given choice of parameters.
+#   Runs n_sim simulations of the coevolutionary model per empirical network for several different 
+#   mean gene flow values (g) using a given choice of parameters. In these simulations we save the
+#   trait values through time.
 #
 # Returns:
 #   Saves two csv files (one for each site) containing the environmental optimum values in the first row
@@ -51,7 +52,7 @@ epsilon = 0.000001
 t_max = 10000
 
 # defining folder to store results
-folder = "~/simulations/"
+folder = "output/data/simulations_empirical_networks/"
 
 # creating folder to store results
 dir.create(path = paste(folder, "all_networks", "_mA", m_A_char, "_mB", m_B_char, "_g",

@@ -21,14 +21,14 @@ m_B_char = paste("mB", gsub(".", "", as.character(m_B), fixed = TRUE), sep = "")
 g_char = paste("g", gsub(".", "", as.character(g), fixed = TRUE), sep = "")
   
 # network names
-net_names = dir(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/",
+net_names = dir(paste("output/data/simulations_empirical_networks/",
                       "all_networks_", m_A_char, "_", m_B_char, "_g0-03", sep = ""))
 
 final_mut_mat_df_all_nets = data.frame()
 
 for (i in 1:length(net_names)) {
   # simulation file names for the current network
-  files = dir(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/",
+  files = dir(paste("output/data/simulations_empirical_networks/",
                     "all_networks_", m_A_char, "_", m_B_char, "_g0-03/", net_names[i], sep = ""))
     
   # extracting g values from the file names
@@ -102,7 +102,7 @@ for (i in 1:length(net_names)) {
   # calculating species trait matching
   for (j in 1:length(files_sub)) {
     # reading trait values
-    traits = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/",
+    traits = read.csv(paste("output/data/simulations_empirical_networks/",
                             "all_networks_", m_A_char, "_", m_B_char, "_g0-03/",
                             net_names[i], "/", files_sub[j], sep = ""), row.names = 1)
     # trait values at equilibrium
@@ -121,7 +121,7 @@ for (i in 1:length(net_names)) {
 
 # saving results
 write.csv(final_mut_mat_df_all_nets, row.names = FALSE, 
-          file = paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/",
+          file = paste("output/data/simulations_empirical_networks/summary_coevo_results/",
                        "coevo_results_pairwise_matching_sp_degree_",
                        m_A_char, "_", m_B_char, "_", g_char, "_site", site, ".csv", sep = ""))
 

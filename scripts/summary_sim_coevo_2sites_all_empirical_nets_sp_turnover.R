@@ -28,7 +28,7 @@ g_min_char = gsub(".", "", as.character(g_min), fixed = TRUE)
 g_max_char = gsub(".", "", as.character(g_max), fixed = TRUE)
 
 # defining folder with simulation results 
-folder = paste("~/Lucas/Projects/spatial_coevo_mutnet/output/data/simulations_empirical_networks/",
+folder = paste("output/data/simulations_empirical_networks/",
                "all_networks", "_mA", m_A_char, "_mB", m_B_char, "_g",
                g_min_char, "-", g_max_char, sep = "")
 
@@ -57,9 +57,6 @@ summary_df = data.frame(network = rep(net_names, each = n_sim),
                         sd_final_env_matching = rep(NA, length(net_names)*n_sim))
 
 for (i in 1:length(net_names)) {
-  
-  print(net_names[i])
-  
   # creating vectors to store results
   mean_init_mut_matching = c()
   sd_init_mut_matching = c()
@@ -166,7 +163,7 @@ for (i in 1:length(net_names)) {
 }
 
 # defining folder to store summary spreadsheet
-folder_results = "~/Lucas/Projects/spatial_coevo_mutnet/output/data/simulations_empirical_networks/summary_coevo_results/"
+folder_results = "output/data/simulations_empirical_networks/summary_coevo_results/"
 
 # saving results
 write.csv(summary_df, row.names = FALSE, 

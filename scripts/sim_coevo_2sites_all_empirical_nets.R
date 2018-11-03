@@ -1,8 +1,9 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#   Runs n_sim simulations per empirical network for several different mean gene flow values (g) using
-#   a given choice of parameters.
+#   Runs n_sim simulations of the coevolutionary model per empirical network for several different 
+#   mean gene flow values (g) using a given choice of parameters. These simulations correspond to the
+#   main set of simulations reported in the main text.
 #
 # Returns:
 #   Saves two csv files (one for each site) containing the environmental optimum values in the first row,
@@ -12,22 +13,22 @@
 source("functions/CoevoMutNet2Sites.R")
 
 # defining number of simulations per network
-n_sim = 50
+n_sim = 100
 # defining alpha
 alpha = 0.2
 # defining phi distribution
 phi_mean = 0.5
 phi_sd = 0.01
 # defining mutualism selection distribution
-m_A_mean = 0.9
+m_A_mean = 0.7
 m_A_sd = 0.01
-m_B_mean = 0.3
+m_B_mean = 0.7
 m_B_sd = 0.01
 # defining environmental optimum range
 theta_A_min = 0
 theta_A_max = 10
-theta_B_min = 20
-theta_B_max = 30
+theta_B_min = 10
+theta_B_max = 20
 # defining gene flow range and distribution
 g_min = 0
 g_max = 0.3
@@ -51,7 +52,7 @@ epsilon = 0.000001
 t_max = 10000
 
 # defining folder to store results
-folder = "~/simulations/"
+folder = "output/data/simulations_empirical_networks/"
 
 # creating folder to store results
 dir.create(path = paste(folder, "all_networks", "_mA", m_A_char, "_mB", m_B_char, "_g",
