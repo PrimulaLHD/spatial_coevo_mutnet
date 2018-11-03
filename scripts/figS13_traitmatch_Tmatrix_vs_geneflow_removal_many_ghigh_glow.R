@@ -1,10 +1,11 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#
+#  Reads data on trait matching computed for a gradual loss of gene flow and make a plot
+#  for many high and low values of gene flow.
 #
 # Returns:
-#   
+#  A plot.  
 
 # loading functions and packages
 library(ggplot2)
@@ -13,7 +14,7 @@ library(plyr)
 library(viridis)
 
 # defining folder with results
-result_files = dir("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_geneflow_removal/")
+result_files = dir("output/data/simulations_empirical_networks/simulations_geneflow_removal/")
 
 # defining gene flow scenarios
 g_scen = data.frame(g_high = c(0.3, 0.3, 0.3, 0.3, 0.1, 0.1, 0.1), 
@@ -33,7 +34,7 @@ for (j in 1:nrow(g_scen)) {
   # summarizing simulation results
   summ_df = c()
   for (i in 1:length(result_files_curr)) {
-    current_df = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_geneflow_removal/", 
+    current_df = read.csv(paste("output/data/simulations_empirical_networks/simulations_geneflow_removal/", 
                                 result_files_curr[i], sep = ""))
     curr_summ_df = ddply(current_df, c("pert", "m_A", "m_B"),
                          summarize,
@@ -80,6 +81,6 @@ p = ggplot(data = subset(summ_df_all_g_scen, m_A == 0.5 & m_B == 0.5),
         legend.title = element_text(size = 17))
 
 # saving
-save_plot("figSI.pdf", p, ncol = 3, nrow = 3, base_aspect_ratio = 1.2)
+save_plot("output/figs/figS13.pdf", p, ncol = 3, nrow = 3, base_aspect_ratio = 1.2)
 
 #-----------------------------------------------------------------------------------------------------#

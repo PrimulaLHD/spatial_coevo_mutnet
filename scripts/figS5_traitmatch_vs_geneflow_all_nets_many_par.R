@@ -14,18 +14,18 @@ library(cowplot)
 library(viridis)
 
 # getting parameter names
-pars = dir("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/")
+pars = dir("output/data/simulations_empirical_networks/sensitivity_analysis/")
 
 # to store results
 summ_final_mut_mat_df = c()
 
 for (i in 1:length(pars)) {
   # files for parameter i
-  par_char = dir(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/",
+  par_char = dir(paste("output/data/simulations_empirical_networks/sensitivity_analysis/",
                        pars[i], sep = ""))
   for (j in 1:length(par_char)) {
     # simulation result files for parameter value j
-    summaries = dir(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/",
+    summaries = dir(paste("output/data/simulations_empirical_networks/sensitivity_analysis/",
                           pars[i], "/", par_char[j], "/summary_coevo_results", sep = ""))
     # getting file names for mA = mB = 0.7 and mA = 0.9, mB = 0.1
     summaries_m = summaries[c(grep("mA07_mB07", summaries), grep("mA09_mB01", summaries))]
@@ -52,7 +52,7 @@ for (i in 1:length(pars)) {
       thetaB_char = substr(split_thetaB, start = 1, stop = nchar(split_thetaB) - 4)
       
       # reading file with simulation results
-      current_df = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/",
+      current_df = read.csv(paste("output/data/simulations_empirical_networks/sensitivity_analysis/",
                                   pars[i], "/", par_char[j], "/summary_coevo_results/", summaries_m[k], sep = ""))
       
       # adding parameter values
@@ -82,8 +82,8 @@ for (i in 1:length(pars)) {
 
 # saving/reading results
 write.csv(summ_final_mut_mat_df, row.names = FALSE, 
-          file = "~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching_sensitivity_analysis.csv")
-summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching_sensitivity_analysis.csv")
+          file = "output/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching_sensitivity_analysis.csv")
+summ_final_mut_mat_df = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching_sensitivity_analysis.csv")
 
 # changing mutualism names
 summ_final_mut_mat_df$mutualism = as.character(summ_final_mut_mat_df$mutualism)
@@ -234,6 +234,6 @@ p_H = ggplot(data = subset(summ_final_mut_mat_df, site == "A" & alpha == 0.8),
 figSI = plot_grid(p_A, p_B, p_C, p_D, p_E, p_F, p_G, p_H, labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
                    nrow = 4, ncol = 2, label_size = 20)
 
-save_plot("figSI.pdf", figSI, ncol = 2, nrow = 4, base_aspect_ratio = 1.4)
+save_plot("output/figs/figS5.pdf", figSI, ncol = 2, nrow = 4, base_aspect_ratio = 1.4)
 
 #-----------------------------------------------------------------------------------------------------#

@@ -57,16 +57,16 @@ simulation = c()
 
 for (i in 1:length(m_char)) {
   # obtaining simulation files
-  folders = dir("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_all_timesteps/")
+  folders = dir("output/data/simulations_empirical_networks/simulations_all_timesteps/")
   folder = folders[grep(m_char[i], folders)]
-  files = dir(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_all_timesteps/",
+  files = dir(paste("output/data/simulations_empirical_networks/simulations_all_timesteps/",
                     folder, "/", network, sep = ""))
   files_g = files[grep(g_char, files)]
   files_g_site = files_g[grep(site_char, files_g)]
   
   for (j in 1:length(files_g_site)) {
     # read trait values through time
-    traits_df = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_all_timesteps/",
+    traits_df = read.csv(paste("output/data/simulations_empirical_networks/simulations_all_timesteps/",
                                folder, "/", network, "/", files_g_site[j], sep = ""))
     # removing 1st column with labels
     traits_df = traits_df[ , 2:ncol(traits_df)]
@@ -130,7 +130,7 @@ p_B = ggplot(data = subset(results_df, time < 30),
 figSI = plot_grid(p_A, p_B, labels = c("A", "B"), label_size = 22, 
                   nrow = 2, align = "v")
 
-save_plot("figSI.pdf", figSI,
+save_plot("output/figs/figS1.pdf", figSI,
           ncol = 1, nrow = 2,
           base_aspect_ratio = 3)
 

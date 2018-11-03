@@ -16,7 +16,7 @@ library(viridis)
 network_structure = read.csv("output/data/network_structure/network_structure.csv")
 
 # summary of coevolution results
-summaries = dir("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/")
+summaries = dir("output/data/simulations_empirical_networks/sensitivity_analysis/sp_turnover/summary_coevo_results/")
 
 # extracting mA, mB and g values from files names
 split_mA = sub(".*_mA", "", summaries)
@@ -29,7 +29,7 @@ mB = as.numeric(sub("(.*0)(.*)", "\\1.\\2", mB_char))
 # calculating mean trait matching for many simulations
 summ_final_mut_mat_df = c()
 for (i in 1:length(summaries)) {
-  current_df = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/", 
+  current_df = read.csv(paste("output/data/simulations_empirical_networks/sensitivity_analysis/sp_turnover/summary_coevo_results/", 
                               summaries[i], sep = ""))
   current_df$m_A = rep(mA[i], nrow(current_df))
   current_df$m_B = rep(mB[i], nrow(current_df))
@@ -45,8 +45,8 @@ for (i in 1:length(summaries)) {
 
 # saving/reading results
 write.csv(summ_final_mut_mat_df, row.names = FALSE, 
-          file = "~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
-summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
+          file = "output/data/simulations_empirical_networks/sensitivity_analysis/sp_turnover/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
+summ_final_mut_mat_df = read.csv("output/data/simulations_empirical_networks/sensitivity_analysis/sp_turnover/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
 
 # changing mutualism names
 summ_final_mut_mat_df$mutualism = as.character(summ_final_mut_mat_df$mutualism)
@@ -67,43 +67,45 @@ purple = "#A020F0"
 my_palette = c(orange, red, cyan, blue, green, purple)
 
 # Fig A: mean final trait matching as a function of gene flow for site A
-p_A = ggplot(data = subset(summ_final_mut_mat_df, site == "A"),
+p_A = ggplot(data = subset(summ_final_mut_mat_df, site == "A" & 
+                             ((m_A == 0.7 & m_B == 0.7) | (m_A == 0.9 & m_B == 0.1))),
              aes(x = g, y = mean_final_mut_mat, color = mutualism)) +
-  geom_point(size = 0.5, shape = 19, alpha = 0.5) + 
+  geom_point(size = 1.3, shape = 19, alpha = 0.6) + 
   scale_color_manual(values = my_palette) +
   xlab("Mean gene flow") +
   ylab("Mean trait matching at site A") +
-  facet_grid(m_A ~ m_B, scales = "free", labeller = label_both) +
-  theme(axis.text.x = element_text(size = 8),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 13),
-        strip.text.x = element_text(size = 8),
-        strip.text.y = element_text(size = 8),
+  facet_wrap(m_A ~ m_B, scales = "free", labeller = label_both) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        strip.text.x = element_text(size = 10),
+        strip.text.y = element_text(size = 10),
         legend.position = "none")
 
 # Fig B: mean final trait matching as a function of gene flow for site B
-p_B = ggplot(data = subset(summ_final_mut_mat_df, site == "B"),
+p_B = ggplot(data = subset(summ_final_mut_mat_df, site == "B" & 
+                             ((m_A == 0.7 & m_B == 0.7) | (m_A == 0.9 & m_B == 0.1))),
              aes(x = g, y = mean_final_mut_mat, color = mutualism)) +
-  geom_point(size = 0.5, shape = 19, alpha = 0.5) + 
+  geom_point(size = 1.3, shape = 19, alpha = 0.6) + 
   scale_color_manual(values = my_palette) +
   xlab("Mean gene flow") +
   ylab("Mean trait matching at site B") +
-  facet_grid(m_A ~ m_B, scales = "free", labeller = label_both) +
-  theme(axis.text.x = element_text(size = 8),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 13),
-        strip.text.x = element_text(size = 8),
-        strip.text.y = element_text(size = 8),
+  facet_wrap(m_A ~ m_B, scales = "free", labeller = label_both) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        strip.text.x = element_text(size = 10),
+        strip.text.y = element_text(size = 10),
         legend.position = "none")
 
 # a dummie plot just to get the legend
 p_legend = ggplot(data = subset(summ_final_mut_mat_df, site == "A"),
                   aes(x = g, y = mean_final_mut_mat, color = mutualism)) +
-  geom_point(size = 0.5, shape = 19, alpha = 0.5) + 
+  geom_point(size = 1.3, shape = 19, alpha = 0.6) + 
   scale_color_manual(values = my_palette) +
-  guides(color = guide_legend(override.aes = list(size = 2))) +
-  theme(legend.key.size = unit(0.5, "cm"),
-        legend.text = element_text(size = 10),
+  guides(color = guide_legend(override.aes = list(size = 2.2))) +
+  theme(legend.key.size = unit(0.6, "cm"),
+        legend.text = element_text(size = 12),
         legend.title = element_blank())
 
 legend = get_legend(p_legend)
@@ -113,9 +115,9 @@ figSI = ggdraw() +
   draw_plot(p_A, 0, 0.5, 0.72, 0.5) +
   draw_plot(p_B, 0, 0, 0.72, 0.5) +
   draw_plot(legend, 0.85, 0.52, 0.01, 0.01) +
-  draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.51), size = 22)
+  draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.51), size = 23)
 
 # saving
-save_plot("figSI.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 1.8)
+save_plot("output/figs/figS7.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 2.2)
 
 #-----------------------------------------------------------------------------------------------------#

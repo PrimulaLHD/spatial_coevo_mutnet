@@ -12,8 +12,8 @@ library(ggplot2)
 library(cowplot)
 
 # reading data
-summ_final_env_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_env_matching.csv")
-summ_final_geo_div_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_geo_div.csv")
+summ_final_env_mat_df = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_env_matching.csv")
+summ_final_geo_div_df = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_geo_div.csv")
 
 # changing mutualism names
 summ_final_env_mat_df$mutualism = as.character(summ_final_env_mat_df$mutualism)
@@ -93,6 +93,6 @@ figSI = ggdraw() +
   draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.51), size = 23)
 
 # saving
-save_plot("figSI.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 2.2)
+save_plot("output/figs/figS4.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 2.2)
 
 #-----------------------------------------------------------------------------------------------------#

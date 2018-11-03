@@ -18,8 +18,8 @@ library(viridis)
 #----------------------------------#
 
 # reading data
-final_mut_mat_df_all_nets_g0 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA07_mB07_g0_siteA.csv")
-final_mut_mat_df_all_nets_g03 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA07_mB07_g03_siteA.csv")
+final_mut_mat_df_all_nets_g0 = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA07_mB07_g0_siteA.csv")
+final_mut_mat_df_all_nets_g03 = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA07_mB07_g03_siteA.csv")
 
 # reading network structure data
 net_struct = read.csv("output/data/network_structure/network_structure.csv")
@@ -74,8 +74,8 @@ p_A = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40),
 #-------------------------------------------------------#
 
 # reading data
-final_mut_mat_df_all_nets_g0 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA09_mB01_g0_siteA.csv")
-final_mut_mat_df_all_nets_g03 = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA09_mB01_g03_siteA.csv")
+final_mut_mat_df_all_nets_g0 = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA09_mB01_g0_siteA.csv")
+final_mut_mat_df_all_nets_g03 = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/coevo_results_pairwise_matching_sp_degree_mA09_mB01_g03_siteA.csv")
 
 # computing mean trait matching difference for each species pair across simulations
 summ_final_mut_matching_g0 = ddply(final_mut_mat_df_all_nets_g0, c("network", "interaction"),
@@ -122,7 +122,7 @@ p_B = ggplot(data = subset(summ_final_dif_matching, k_col < 40 & k_row < 40),
 figSI = plot_grid(p_A, p_B, labels = c("A", "B"), label_size = 23, 
                   nrow = 2, align = "v")
 
-save_plot("figSI.pdf", figSI,
+save_plot("output/figs/figS3.pdf", figSI,
           ncol = 1, nrow = 2,
           base_aspect_ratio = 2.35)
 

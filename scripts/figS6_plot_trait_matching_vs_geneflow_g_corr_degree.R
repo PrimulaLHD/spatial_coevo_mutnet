@@ -16,7 +16,7 @@ library(viridis)
 network_structure = read.csv("output/data/network_structure/network_structure.csv")
 
 # summary of coevolution results
-summaries = dir("~/Lucas/Projects/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/")
+summaries = dir("output/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/")
 
 # extracting mA, mB and g values from files names
 split_mA = sub(".*_mA", "", summaries)
@@ -29,7 +29,7 @@ mB = as.numeric(sub("(.*0)(.*)", "\\1.\\2", mB_char))
 # calculating mean trait matching for many simulations
 summ_final_mut_mat_df = c()
 for (i in 1:length(summaries)) {
-  current_df = read.csv(paste("~/Lucas/Projects/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/", 
+  current_df = read.csv(paste("output/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/", 
                               summaries[i], sep = ""))
   current_df$m_A = rep(mA[i], nrow(current_df))
   current_df$m_B = rep(mB[i], nrow(current_df))
@@ -45,8 +45,8 @@ for (i in 1:length(summaries)) {
 
 # saving/reading results
 write.csv(summ_final_mut_mat_df, row.names = FALSE, 
-          file = "~/Lucas/Projects/spatial_coevo_mutnet_results/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
-summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
+          file = "output/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
+summ_final_mut_mat_df = read.csv("output/data/simulations_empirical_networks/sensitivity_analysis/g_correlated_with_degree/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
 
 # changing mutualism names
 summ_final_mut_mat_df$mutualism = as.character(summ_final_mut_mat_df$mutualism)
@@ -118,6 +118,6 @@ figSI = ggdraw() +
   draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.51), size = 23)
 
 # saving
-save_plot("figSI.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 2.2)
+save_plot("output/figs/figS6.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 2.2)
 
 #-----------------------------------------------------------------------------------------------------#

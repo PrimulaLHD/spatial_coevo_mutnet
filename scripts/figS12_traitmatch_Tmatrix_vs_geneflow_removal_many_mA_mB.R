@@ -1,10 +1,11 @@
 #-----------------------------------------------------------------------------------------------------#
 
 # Description: 
-#
+#  Reads data on trait matching computed for a gradual loss of gene flow and make a plot
+#  for many different combinations of mutualistic selection.
 #
 # Returns:
-#   
+#  A plot.   
 
 # loading functions and packages
 library(ggplot2)
@@ -12,7 +13,7 @@ library(cowplot)
 library(plyr)
 
 # defining folder with results
-result_files = dir("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_geneflow_removal/")
+result_files = dir("output/data/simulations_empirical_networks/simulations_geneflow_removal/")
 
 # defining gene flow scenarios
 g_scen = data.frame(g_high = c(0.3, 0.3, 0.3, 0.3, 0.1, 0.1, 0.1), 
@@ -32,7 +33,7 @@ for (j in 1:nrow(g_scen)) {
   # summarizing simulation results
   summ_df = c()
   for (i in 1:length(result_files_curr)) {
-    current_df = read.csv(paste("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/simulations_geneflow_removal/", 
+    current_df = read.csv(paste("output/data/simulations_empirical_networks/simulations_geneflow_removal/", 
                                 result_files_curr[i], sep = ""))
     curr_summ_df = ddply(current_df, c("pert", "m_A", "m_B"),
                          summarize,
@@ -113,6 +114,6 @@ figSI = ggdraw() +
   draw_plot_label(c("A", "B"), c(0, 0), c(1, 0.51), size = 22)
 
 # saving
-save_plot("figSI.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 1.8)
+save_plot("output/figs/figS12.pdf", figSI, ncol = 1, nrow = 2, base_aspect_ratio = 1.8)
 
 #-----------------------------------------------------------------------------------------------------#
