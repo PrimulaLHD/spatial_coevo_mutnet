@@ -17,7 +17,7 @@ network_structure$PC1 = -network_structure$PC1
 network_structure$PC2 = -network_structure$PC2
 
 # simulation data
-summ_final_mut_mat_df = read.csv("~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
+summ_final_mut_mat_df = read.csv("output/data/simulations_empirical_networks/summary_coevo_results/summary_coevo_results_final_mut_matching.csv")
 
 # changing mutualism names
 summ_final_mut_mat_df$mutualism = as.character(summ_final_mut_mat_df$mutualism)
