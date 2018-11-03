@@ -14,7 +14,7 @@ library(ggplot2)
 library(cowplot)
 
 # defining folder with results
-result_files = dir("output/data/simulations_empirical_networks/summary_coevo_results/simulations_geneflow_removal")
+result_files = dir("output/data/simulations_empirical_networks/simulations_geneflow_removal")
 
 # selecting the files with the desired gene flow values
 result_files = result_files[grep("g03-0.csv", result_files)]
@@ -33,7 +33,7 @@ net_names_bin = gsub("wgt", "bin", net_names)
 summ_df = c()
 
 for (i in 1:length(result_files)) {
-  current_df = read.csv(paste("output/data/simulations_empirical_networks/summary_coevo_results/simulations_geneflow_removal/", 
+  current_df = read.csv(paste("output/data/simulations_empirical_networks/simulations_geneflow_removal/", 
                               result_files[i], sep = ""))
   
   curr_summ_df = ddply(current_df, c("pert", "m_A", "m_B"),
