@@ -156,6 +156,6 @@ for (i in 1:length(net_files)) {
 
 # saving results
 write.csv(summary_df, row.names = FALSE, 
-          file = "~/LUCAS/spatial_coevo_mutnet_results/data/simulations_empirical_networks/summary_coevo_results/results_comparing_analytical_with_g_vs_no_g.csv")
+          file = "output/data/simulations_empirical_networks/summary_coevo_results/results_comparing_analytical_with_g_vs_no_g.csv")
 
 #-----------------------------------------------------------------------------------------------------#
