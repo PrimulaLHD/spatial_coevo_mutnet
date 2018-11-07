@@ -11,7 +11,7 @@ require(cowplot)
 ##
 
 ## load data
-load('data/Tsims.RData')
+load('output/data/simulations_empirical_networks/T_sim/Tsims.RData')
 
 source('functions/buildTmat.R')
 source('functions/assembleQ.R')
@@ -34,7 +34,7 @@ T.sims.sumdf <-
     group_by(network, g, mA, mB, type) %>%
     summarise_each(funs(mean))
 
-load('data/Tsims_gzero.RData')
+load('output/data/simulations_empirical_networks/T_sim/Tsims_gzero.RData')
 
 ## real columns as real
 gzero.re.trans <-
@@ -55,7 +55,7 @@ gzero.sumdf <-
 
 
 ## FIG gzero_all_sites_trait_match
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_gzero_all_sites_trait_match_vs_corr.pdf', width = 8, height = 5)
+pdf('figSI_gzero_all_sites_trait_match_vs_corr.pdf', width = 8, height = 5)
 
 ggplot(gzero.sumdf) +
     geom_line(aes(x = final.mcorr.lines, y = final.tm, group = network),
@@ -70,7 +70,7 @@ ggplot(gzero.sumdf) +
 
 dev.off(dev.cur())
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_gzero_all_sites_trait_match_vs_sd.pdf',
+pdf('figSI_gzero_all_sites_trait_match_vs_sd.pdf',
     width = 8, height = 5)
 
 ggplot(gzero.sumdf) +
@@ -85,7 +85,7 @@ ggplot(gzero.sumdf) +
 dev.off(dev.cur())
 
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_gzero_all_sites_trait_match_vs_perc.pdf', width = 8, height = 5)
+pdf('figSI_gzero_all_sites_trait_match_vs_perc.pdf', width = 8, height = 5)
 
 ggplot(gzero.sumdf) +
     geom_line(aes(x = final.perc, y = final.tm, group = network),
@@ -100,7 +100,7 @@ dev.off(dev.cur())
 
 ## FIG S8
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_sitetype_m07_trait_match_vs_corr.pdf',
+pdf('figSI_sitetype_m07_trait_match_vs_corr.pdf',
     width = 8, height = 8)
 
 ggplot(subset(T.sims.sumdf, mA == '0.7' & mB == '0.7')) +
@@ -117,7 +117,7 @@ ggplot(subset(T.sims.sumdf, mA == '0.7' & mB == '0.7')) +
 
 dev.off(dev.cur())
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_sitetype_m07_trait_match_vs_sd.pdf',
+pdf('figSI_sitetype_m07_trait_match_vs_sd.pdf',
     width = 8, height = 8)
 
 ggplot(subset(T.sims.sumdf, mA == '0.7' & mB == '0.7')) +
@@ -134,7 +134,7 @@ ggplot(subset(T.sims.sumdf, mA == '0.7' & mB == '0.7')) +
 
 dev.off(dev.cur())
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_sitetype_m07_trait_match_vs_perc.pdf',
+pdf('figSI_sitetype_m07_trait_match_vs_perc.pdf',
     width = 8, height = 8)
 
 ggplot(subset(T.sims.sumdf, mA == '0.7' & mB == '0.7')) +
@@ -153,7 +153,7 @@ dev.off(dev.cur())
 
 ## FIG S8_2
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_sitetype_mA09_mB01_trait_match_vs_corr.pdf',
+pdf('figSI_sitetype_mA09_mB01_trait_match_vs_corr.pdf',
     width = 8, height = 8)
 
 ggplot(subset(T.sims.sumdf, mA == '0.9' & mB == '0.1')) +
@@ -170,7 +170,7 @@ ggplot(subset(T.sims.sumdf, mA == '0.9' & mB == '0.1')) +
 
 dev.off(dev.cur())
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_sitetype_mA09_mB01_trait_match_vs_sd.pdf',
+pdf('figSI_sitetype_mA09_mB01_trait_match_vs_sd.pdf',
     width = 8, height = 8)
 
 ggplot(subset(T.sims.sumdf, mA == '0.9' & mB == '0.1')) +
@@ -187,7 +187,7 @@ ggplot(subset(T.sims.sumdf, mA == '0.9' & mB == '0.1')) +
 
 dev.off(dev.cur())
 
-pdf('~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_sitetype_mA09_mB01_trait_match_vs_perc.pdf',
+pdf('figSI_sitetype_mA09_mB01_trait_match_vs_perc.pdf',
     width = 8, height = 8)
 
 ggplot(subset(T.sims.sumdf, mA == '0.9' & mB == '0.1')) +
@@ -293,7 +293,7 @@ ggplot(carlo.df) +
 
 ## submatrices no geneflow
 
-pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Carlo_no_geneflow_m01_09.pdf',
+pdf(file = 'figSI_Carlo_no_geneflow_m01_09.pdf',
     width = 15, height = 7)
 
 ggplot(subset(carlo.df, row %in% as.character(1:36) & col %in% as.character(1:36) & g == 0)) +
@@ -311,7 +311,7 @@ dev.off(dev.cur())
 
 ## fullmatrices, geneflow effect
 
-pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Carlo_g005_03_mA07_mB07.pdf',
+pdf(file = 'figSI_Carlo_g005_03_mA07_mB07.pdf',
     width = 15, height = 7)
 
 ggplot(subset(carlo.df, g != 0)) +
@@ -380,7 +380,7 @@ ggplot(galetti.df) +
 
 ## submatrices no geneflow
 
-pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Galetti_no_geneflow_m01_09.pdf',
+pdf(file = 'figSI_Galetti_no_geneflow_m01_09.pdf',
     width = 15, height = 7)
 
 ggplot(subset(galetti.df, row %in% as.character(1:64) &
@@ -399,7 +399,7 @@ dev.off(dev.cur())
 
 ## fullmatrices, geneflow effect
 
-pdf(file = '~/Dropbox/spatial_coevo_mutnet/results/figs/figSI_Galetti_g005_03_mA07_mB07.pdf',
+pdf(file = 'figSI_Galetti_g005_03_mA07_mB07.pdf',
     width = 15, height = 7)
 
 ggplot(subset(galetti.df, g != 0)) +
